@@ -1,0 +1,108 @@
+# Java compiled files
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Spring Boot
+.idea/
+*.iws
+*.iml
+*.ipr
+.settings/
+.project
+.classpath
+.springBeans
+
+# STS
+eclipse/
+.apt_generated/
+.factorypath
+.recommenders/
+bin/
+
+# Angular
+/dist
+/tmp
+/out-tsc
+/.angular/cache
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
+# Local development environment
+.idea/
+*.iml
+.project
+.settings/
+
+# Frontend specific
+/coverage
+/lib
+
+# Backend specific
+.mvn/
+.mvn/wrapper/maven-wrapper.properties
+
+# Ignore application properties with sensitive data
+**/application-*.properties
+!**/application.properties
+!**/application.yml
+
+# H2 database files
+*.h2.db
+*.lock.db
+
+# VS Code
+.history/
+
+# Testing
+/coverage
+
+# End of https://www.toptal.com/developers/gitignore/api/java,angular,node,linux,macos,windows,visualstudiocode,jetbrains+all
