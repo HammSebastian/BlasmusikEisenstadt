@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BlasmusikwebsiteApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BlasmusikwebsiteApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BlasmusikwebsiteApplication.class, args);
+    }
 
 }
