@@ -1,0 +1,1 @@
+INSERT INTO app_user (id, username, email, password, role) VALUES (1, 'sebastian', 'sebastian@stadtkapelle-eisenstadt.at', 's', 'ADMIN');

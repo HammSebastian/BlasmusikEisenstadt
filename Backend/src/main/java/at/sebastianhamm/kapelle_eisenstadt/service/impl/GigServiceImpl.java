@@ -1,69 +1,89 @@
 package at.sebastianhamm.kapelle_eisenstadt.service.impl;
 
 import at.sebastianhamm.kapelle_eisenstadt.dao.GigDao;
-import at.sebastianhamm.kapelle_eisenstadt.dto.GigRequest;
-import at.sebastianhamm.kapelle_eisenstadt.dto.GigResponse;
-import at.sebastianhamm.kapelle_eisenstadt.entity.Gig;
-import at.sebastianhamm.kapelle_eisenstadt.exception.ResourceNotFoundException;
+import at.sebastianhamm.kapelle_eisenstadt.dto.GigDto;
+import at.sebastianhamm.kapelle_eisenstadt.exception.GigAlreadyExistsException;
+import at.sebastianhamm.kapelle_eisenstadt.models.Gig;
 import at.sebastianhamm.kapelle_eisenstadt.service.GigService;
-import at.sebastianhamm.kapelle_eisenstadt.util.DtoMapper;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
-@Transactional
+@Service(value = "gigService")
 public class GigServiceImpl implements GigService {
 
-    private final GigDao gigDao;
+    private static final Logger logger = LoggerFactory.getLogger(GigServiceImpl.class);
 
     @Autowired
-    public GigServiceImpl(GigDao gigDao) {
-        this.gigDao = gigDao;
+    private GigDao gigDao;
+
+    @Override
+    public List<GigDto> findAll() {
+        logger.debug("Retrieving gig list");
+        List<GigDto> list = new ArrayList<>();
+        gigDao.findAll().iterator().forEachRemaining(u -> list.add(map(u)));
+        return list;
     }
 
     @Override
-    public List<GigResponse> findAll() {
-        return gigDao.findAll().stream()
-                .map(DtoMapper::toGigResponse)
-                .collect(Collectors.toList());
+    public GigDto findById(Long id) {
+        Validate.notNull(id, "id must not be null");
+        logger.debug("Find gig by id {}", id);
+        Optional<Gig> optionalGig = gigDao.findById(id);
+        return optionalGig.map(this::map).orElse(null);
     }
 
     @Override
-    public GigResponse findById(Long id) {
-        Gig gig = gigDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Gig", "id", id));
-        return DtoMapper.toGigResponse(gig);
+    public GigDto save(GigDto gigDto) {
+        Validate.notNull(gigDto);
+        Validate.notNull(gigDto.getTitle(), "title must not be null");
+
+        logger.info("Saving user new user {}", gigDto.getTitle());
+
+        Optional<Gig> gig = gigDao.findGigByTitle(gigDto.getTitle());
+        if (gig.isPresent()) {
+            logger.warn("Gig {} already exists", gigDto.getTitle());
+            throw new GigAlreadyExistsException("Gig already exists!");
+        }
+
+        Gig newGig = new Gig();
+        BeanUtils.copyProperties(gigDto, newGig);
+        newGig = gigDao.save(newGig);
+        return map(newGig);
     }
 
     @Override
-    public GigResponse save(GigRequest gigRequest) {
-        Gig gig = DtoMapper.toGig(gigRequest);
-        Gig savedGig = gigDao.save(gig);
-        return DtoMapper.toGigResponse(savedGig);
-    }
+    public GigDto update(GigDto gigDto) {
+        Validate.notNull(gigDto);
+        Validate.notNull(gigDto.getId(), "gigDto.id must not be null");
+        logger.info("Updating user {}", gigDto.getId());
 
-    @Override
-    public GigResponse update(Long id, GigRequest gigRequest) {
-        Gig existingGig = gigDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Gig", "id", id));
-        
-        existingGig.setGigTitel(gigRequest.getGigTitel());
-        existingGig.setGigDescription(gigRequest.getGigDescription());
-        existingGig.setGigLocation(gigRequest.getGigLocation());
-        existingGig.setGigDate(gigRequest.getGigDate());
-        
-        Gig updatedGig = gigDao.save(existingGig);
-        return DtoMapper.toGigResponse(updatedGig);
+        Optional<Gig> optionalGig = gigDao.findById(gigDto.getId());
+        Validate.isTrue(optionalGig.isPresent());
+        Gig gig = optionalGig.get();
+        BeanUtils.copyProperties(gigDto, gig);
+        gigDao.save(gig);
+        return gigDto;
     }
 
     @Override
     public void delete(Long id) {
-        Gig gig = gigDao.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Gig", "id", id));
-        gigDao.delete(gig);
+        Validate.notNull(id, "id must not be null");
+        logger.info("Deleting gig with id {}",id);
+        gigDao.deleteById(id);
+    }
+
+    private GigDto map(Gig gig) {
+        GigDto gigDto = new GigDto();
+        BeanUtils.copyProperties(gig, gigDto);
+        return gigDto;
     }
 }

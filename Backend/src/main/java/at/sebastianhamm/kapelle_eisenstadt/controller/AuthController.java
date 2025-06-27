@@ -1,37 +1,44 @@
 package at.sebastianhamm.kapelle_eisenstadt.controller;
 
-import at.sebastianhamm.kapelle_eisenstadt.dto.AuthenticationRequest;
-import at.sebastianhamm.kapelle_eisenstadt.dto.AuthenticationResponse;
-import at.sebastianhamm.kapelle_eisenstadt.dto.RegisterRequest;
-import at.sebastianhamm.kapelle_eisenstadt.service.AuthenticationService;
-import jakarta.validation.Valid;
+import at.sebastianhamm.kapelle_eisenstadt.dto.AuthToken;
+import at.sebastianhamm.kapelle_eisenstadt.dto.LoginUser;
+import at.sebastianhamm.kapelle_eisenstadt.dto.UserDto;
+import at.sebastianhamm.kapelle_eisenstadt.config.JwtTokenUtil;
+import at.sebastianhamm.kapelle_eisenstadt.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.*;
 
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/token")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationService authenticationService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
-        // Ensure default role is set if not provided
-        RegisterRequest requestWithDefaultRole = RegisterRequest.withDefaultRole(request);
-        return ResponseEntity.ok(authenticationService.register(requestWithDefaultRole));
-    }
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @Valid @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+    @Autowired
+    private UserService userService;
+
+    private static final Logger logger = LogManager.getLogger(AuthController.class);
+
+    @PostMapping(value = "/generate-token")
+    public AuthToken login(@RequestBody LoginUser loginUser) throws AuthenticationException {
+        logger.debug("Login User: " + loginUser.getUsername());
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword()));
+        final UserDto user = userService.findByName(loginUser.getUsername());
+        final String token = jwtTokenUtil.generateToken(user);
+        return new AuthToken(token, user.getUsername());
     }
 }

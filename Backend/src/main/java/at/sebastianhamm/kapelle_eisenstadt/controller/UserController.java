@@ -1,56 +1,45 @@
 package at.sebastianhamm.kapelle_eisenstadt.controller;
 
-import at.sebastianhamm.kapelle_eisenstadt.dto.UserRequest;
-import at.sebastianhamm.kapelle_eisenstadt.dto.UserResponse;
+import at.sebastianhamm.kapelle_eisenstadt.dto.UserDto;
 import at.sebastianhamm.kapelle_eisenstadt.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
-
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    private UserService userService;
+
+    @PostMapping
+    public UserDto saveUser(@RequestBody UserDto user){
+        return userService.save(user);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAll());
+    //@Secured("ROLE_ADMIN")
+    public List<UserDto> listUser(){
+        return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.findById(id));
-    }
-
-    @GetMapping("/username/{username}")
-    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok(userService.findByUsername(username));
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userService.save(userRequest));
+    public UserDto getById(@PathVariable Long id){
+        return userService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userService.update(id, userRequest));
+    public UserDto update(@RequestBody UserDto userDto) {
+        return userService.update(userDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public Void delete(@PathVariable Long id) {
         userService.delete(id);
-        return ResponseEntity.noContent().build();
+        return null;
     }
 }

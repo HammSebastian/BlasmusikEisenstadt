@@ -1,51 +1,44 @@
 package at.sebastianhamm.kapelle_eisenstadt.controller;
 
-import at.sebastianhamm.kapelle_eisenstadt.dto.GigRequest;
-import at.sebastianhamm.kapelle_eisenstadt.dto.GigResponse;
+import at.sebastianhamm.kapelle_eisenstadt.dto.GigDto;
 import at.sebastianhamm.kapelle_eisenstadt.service.GigService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/gigs")
+@RequestMapping("/gigs")
 public class GigController {
 
-    private final GigService gigService;
-
     @Autowired
-    public GigController(GigService gigService) {
-        this.gigService = gigService;
-    }
+    private GigService gigService;
 
     @GetMapping
-    public ResponseEntity<List<GigResponse>> getAllGigs() {
-        return ResponseEntity.ok(gigService.findAll());
+    public List<GigDto> findAll() {
+        return gigService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GigResponse> getGigById(@PathVariable Long id) {
-        return ResponseEntity.ok(gigService.findById(id));
+    public GigDto findById(@PathVariable Long id) {
+        return gigService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<GigResponse> createGig(@Valid @RequestBody GigRequest gigRequest) {
-        return ResponseEntity.ok(gigService.save(gigRequest));
+    public GigDto saveGig(@Valid @RequestBody GigDto gigDto) {
+        return gigService.save(gigDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GigResponse> updateGig(
-            @PathVariable Long id, 
-            @Valid @RequestBody GigRequest gigRequest) {
-        return ResponseEntity.ok(gigService.update(id, gigRequest));
+    public GigDto update(@Valid @RequestBody GigDto gigDto) {
+        return gigService.update(gigDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGig(@PathVariable Long id) {
+    public Void delete(@PathVariable Long id) {
         gigService.delete(id);
-        return ResponseEntity.noContent().build();
+        return null;
     }
 }

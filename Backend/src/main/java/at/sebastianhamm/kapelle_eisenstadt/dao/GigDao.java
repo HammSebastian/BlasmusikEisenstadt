@@ -7,18 +7,23 @@
 package at.sebastianhamm.kapelle_eisenstadt.dao;
 
 
-import at.sebastianhamm.kapelle_eisenstadt.entity.Gig;
+import at.sebastianhamm.kapelle_eisenstadt.models.Gig;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public interface GigDao extends JpaRepository<Gig, Long> {
 
-    Gig findGigByGigTitel(String gigTitel);
+    List<Gig> findGigsByTitle(String gigTitel);
 
-    String findGigByGigLocation(String gigLocation);
+    List<Gig> findGigsByLocation(String gigLocation);
 
-    Gig findGigByGigDate(LocalDate gigDate);
+    List<Gig> findGigsByDate(Date date);
 
-    String findGigByGigDescription(String gigDescription);
+    List<Gig> findGigsByDescription(String description);
+
+    Optional<Gig> findGigByTitle(String gigTitel);
 }

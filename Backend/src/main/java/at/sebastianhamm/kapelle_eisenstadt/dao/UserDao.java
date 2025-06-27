@@ -6,9 +6,11 @@
 
 package at.sebastianhamm.kapelle_eisenstadt.dao;
 
-import at.sebastianhamm.kapelle_eisenstadt.entity.User;
+import at.sebastianhamm.kapelle_eisenstadt.models.Role;
+import at.sebastianhamm.kapelle_eisenstadt.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserDao extends JpaRepository<User, Long> {
@@ -16,6 +18,6 @@ public interface UserDao extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     
     boolean existsByUsername(String username);
-    
-    User findByRole(String role);
+
+    List<Role> findUsersByRole(Role role);
 }
