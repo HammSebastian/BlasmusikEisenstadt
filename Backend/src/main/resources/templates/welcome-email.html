@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to the Team</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0056b3;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Welcome to the Team!</h1>
+
+    <p>Dear <span th:text="${name}">Name</span>,</p>
+
+    <p>I hope this message finds you well.</p>
+
+    <p>On behalf of the entire team, I would like to warmly welcome you. We are excited to have you on board and look forward to working with you. Your skills and experience will be a valuable addition to our projects.</p>
+
+    <p>If you have any questions or need support, feel free to reach out anytime. We are here to help you get settled and ensure a smooth start.</p>
+
+    <p>Wishing you a successful and productive time with us.</p>
+
+    <p>Best regards,<br>
+        Your Team</p>
+
+    <div class="footer">
+        &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Your Company. All rights reserved.
+    </div>
+</div>
+</body>
+</html>
