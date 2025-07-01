@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.service.impl;
 
-import at.sebastianhamm.backend.entitiy.UserEntity;
+import at.sebastianhamm.backend.entity.UserEntity;
 import at.sebastianhamm.backend.io.ProfileRequest;
 import at.sebastianhamm.backend.io.ProfileResponse;
 import at.sebastianhamm.backend.repository.UserRepository;

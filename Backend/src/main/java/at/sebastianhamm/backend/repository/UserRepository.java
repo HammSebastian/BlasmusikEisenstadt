@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.entitiy.UserEntity;
+import at.sebastianhamm.backend.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

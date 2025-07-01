@@ -91,9 +91,7 @@ logs
 .mvn/wrapper/maven-wrapper.properties
 
 # Ignore application properties with sensitive data
-**/application-*.properties
 !**/application.properties
-!**/application.yml
 
 # H2 database files
 *.h2.db
