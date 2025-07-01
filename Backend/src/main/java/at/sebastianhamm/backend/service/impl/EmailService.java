@@ -1,5 +1,6 @@
 package at.sebastianhamm.backend.service.impl;
 
+import at.sebastianhamm.backend.model.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,15 @@ public class EmailService {
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email", e);
         }
+    }
+
+    public void sendVerificationEmail(User user, String otp) {
+        Context context = new Context();
+        context.setVariable("name", user.getFirstName() + " " + user.getLastName());
+        context.setVariable("email", user.getEmail());
+        context.setVariable("otp", otp);
+        String content = templateEngine.process("verify-email", context);
+        sendHtmlEmail(user.getEmail(), "Account Verification OTP", content);
     }
 }
 

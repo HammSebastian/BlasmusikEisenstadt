@@ -1,13 +1,16 @@
 package at.sebastianhamm.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.sql.Timestamp;
 
 /**
@@ -17,12 +20,11 @@ import java.sql.Timestamp;
  * 
  * The table is mapped to 'tbl_users' in the database.
  */
-@Entity
-@Table(name = "tbl_users")
+@MappedSuperclass
 @Data
-@Builder
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
     /**
@@ -37,38 +39,74 @@ public class UserEntity {
      * Unique user identifier, typically a UUID.
      * Used as a public reference to the user.
      */
-    @Column(unique = true)
+    @Column(unique = true, name = "user_id")
     private String userId;
-
-    /** User's full name or display name */
-    private String name;
 
     /** 
      * User's email address, must be unique across the system.
      * Used for account communication and password reset functionality.
      */
-    @Column(unique = true)
+    @NotBlank
+    @Email
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
     
     /** 
      * Hashed password for user authentication.
      * Should never be stored in plain text.
      */
+    @NotBlank
+    @Size(min = 8, max = 100)
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
+    @Column(nullable = false, length = 100)
     private String password;
-    /** One-time password used for email verification */
-    private String verifyOtp;
+    /** One-time password secret for 2FA */
+    @Column(name = "otp_secret")
+    private String otpSecret;
     
-    /** Flag indicating if the user's email has been verified */
-    private boolean isAccountVerified;
+    /** Expiration timestamp for the OTP */
+    @Column(name = "otp_expiry")
+    private LocalDateTime otpExpiry;
     
-    /** Expiration timestamp for the verification OTP */
-    private Long verifyOtpExpiresAt;
+    /** Flag indicating if OTP is enabled for the user */
+    @Column(name = "otp_enabled")
+    private boolean otpEnabled = false;
     
-    /** One-time password used for password reset */
-    private String resetOtp;
+    /** Flag indicating if the account is locked */
+    @Column(name = "account_non_locked")
+    private boolean accountNonLocked = true;
     
-    /** Expiration timestamp for the password reset OTP */
-    private Long resetOtpExpiresAt;
+    /** Flag indicating if the account is enabled */
+    @Column(name = "enabled")
+    private boolean enabled = true;
+    
+    /** Number of failed login attempts */
+    @Column(name = "failed_attempt")
+    private int failedAttempt = 0;
+    
+    /** Timestamp when the account was locked */
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+    
+    /** Token for password reset */
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+    
+    /** Expiration timestamp for password reset token */
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
+    
+    /** Timestamp of last password reset */
+    @Column(name = "last_password_reset_date")
+    private LocalDateTime lastPasswordResetDate;
+    
+    /** Timestamp of last login */
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
+    
+    /** Flag for email notifications preference */
+    @Column(name = "email_notifications")
+    private boolean emailNotifications = true;
 
     /** 
      * Timestamp when the user account was created.
