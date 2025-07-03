@@ -1,0 +1,79 @@
+/* ==========================================================================
+   Layout Styles
+   ========================================================================== */
+
+/* Ensure the layout takes full viewport height */
+:host {
+  @apply block min-h-screen bg-secondary-50;
+}
+
+/* Sidebar styles */
+.sidebar {
+  @apply fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out;
+  will-change: transform;
+}
+
+/* Main content area */
+.main-content {
+  @apply lg:ml-64 min-h-screen;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Mobile menu button */
+.mobile-menu-button {
+  @apply fixed top-4 left-4 z-50 lg:hidden;
+}
+
+/* Overlay for mobile menu */
+.sidebar-overlay {
+  @apply lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Ensure content is not hidden behind fixed elements */
+.main-content {
+  padding-top: 4rem; /* Space for mobile header */
+  @screen lg {
+    padding-top: 0;
+  }
+}
+
+/* Fix for iOS viewport height issue */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Image styles */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Fix for images in content */
+.content img {
+  @apply my-4 mx-auto rounded-lg shadow-md;
+  max-height: 50vh;
+  object-fit: contain;
+}
+
+/* Ensure embedded content is responsive */
+iframe, embed, object, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fix for flex items in the layout */
+.flex-fix {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Ensure proper stacking context */
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }

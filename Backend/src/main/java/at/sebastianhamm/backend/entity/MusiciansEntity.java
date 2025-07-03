@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tbl_musicans")
+@Table(name = "tbl_musicians")
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,8 +18,12 @@ public class MusiciansEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
     private String imageUrl;
+
     private String description;
+
     private String instrument;
 }

@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tbl_images")
@@ -22,10 +20,16 @@ public class ImageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String url;
+
     private String description;
-    private String tookAt;
+
+    @Column(name = "took_at", nullable = false)
+    private LocalDateTime tookAt;
 
     @ManyToOne
     @JoinColumn(name = "gig_id")
@@ -41,8 +45,8 @@ public class ImageEntity {
 
     @PrePersist
     public void prePersist() {
-        if (tookAt == null || tookAt.equals(new Date().toString())) {
-            throw new IllegalArgumentException("Took at is required");
+        if (tookAt == null) {
+            tookAt = LocalDateTime.now();
         }
     }
 }

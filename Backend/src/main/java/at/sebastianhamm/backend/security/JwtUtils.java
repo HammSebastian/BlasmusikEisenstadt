@@ -2,139 +2,95 @@ package at.sebastianhamm.backend.security;
 
 import at.sebastianhamm.backend.exception.JwtAuthenticationException;
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
-import java.util.*;
-import java.util.function.Function;
+import java.security.Key;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class JwtUtils {
-    private final JwtService jwtService;
 
-    public JwtUtils(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
+    @Value("${jwt.secret.key}")
+    private String jwtSecretBase64;
 
-    public String extractToken(HttpServletRequest request) {
-        String header = request.getHeader(SecurityConstants.TOKEN_HEADER);
-        if (StringUtils.isNotEmpty(header) && header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-            return header.substring(SecurityConstants.TOKEN_PREFIX.length());
+    @Value("${jwt.token.expiration}")
+    private long jwtExpirationMs;
+
+    private Key key;
+
+    private Key getSigningKey() {
+        if (key == null) {
+            byte[] keyBytes = Decoders.BASE64.decode(jwtSecretBase64);
+            if (keyBytes.length < 64) { // HS512 benötigt mindestens 512 bit = 64 byte
+                throw new IllegalArgumentException("JWT secret key too short for HS512, must be at least 64 bytes");
+            }
+            key = Keys.hmacShaKeyFor(keyBytes);
         }
-        return null;
+        return key;
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String generateJwtToken(Authentication authentication) {
+        String username = authentication.getName();
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("roles", roles)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS512)
+                .compact();
     }
 
-    public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public String getUserNameFromJwtToken(String token) {
+        return parseClaims(token).getSubject();
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    public boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String username = extractUsername(token);
-            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-            throw new JwtAuthenticationException("Invalid JWT token", e);
+    public List<String> getRolesFromJwtToken(String token) {
+        Claims claims = parseClaims(token);
+        Object roles = claims.get("roles");
+        if (roles instanceof List<?>) {
+            return ((List<?>) roles).stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .collect(Collectors.toList());
         }
+        return List.of();
     }
 
-    public String generateToken(Authentication authentication) {
-        return jwtService.generateToken(authentication);
-    }
-
-    public String generateRefreshToken(Authentication authentication) {
-        return jwtService.generateRefreshToken(authentication);
-    }
-
-    private Claims extractAllClaims(String token) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(jwtService.getSigningKey())
+                    .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-            throw new JwtAuthenticationException("JWT token is expired", e);
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-            throw new JwtAuthenticationException("JWT token is unsupported", e);
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-            throw new JwtAuthenticationException("Invalid JWT token", e);
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
-            throw new JwtAuthenticationException("JWT claims string is empty", e);
+        } catch (JwtException e) {
+            log.error("JWT parsing error: {}", e.getMessage());
+            throw new JwtAuthenticationException("Invalid JWT token");
         }
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    public boolean validateTokenStructure(String token) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(jwtService.getSigningKey())
-                .build()
-                .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid JWT token structure: {}", e.getMessage());
-            return false;
+        } catch (JwtException e) {
+            log.error("JWT validation error: {}", e.getMessage());
         }
-    }
-
-    public boolean isTokenBlacklisted(String token) {
-        // Implement token blacklist check if needed
         return false;
     }
 
-    public String getUsernameFromToken(String token) {
-        return extractUsername(token);
-    }
-
-    public boolean isTokenExpiringSoon(String token) {
-        try {
-            Date expiration = extractExpiration(token);
-            Date now = new Date();
-            long timeUntilExpiry = expiration.getTime() - now.getTime();
-            // Consider token expiring soon if it expires in less than 5 minutes
-            return timeUntilExpiry < (5 * 60 * 1000);
-        } catch (Exception e) {
-            log.error("Error checking if token is expiring soon: {}", e.getMessage());
-            return true; // If we can't check, assume it's expiring soon
-        }
-    }
-
-    public String refreshToken(String token) {
-        try {
-            String username = getUsernameFromToken(token);
-            // Create a simple authentication object with just the username
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                username, 
-                null, 
-                Collections.emptyList()
-            );
-            return jwtService.generateToken(authentication);
-        } catch (Exception e) {
-            log.error("Error refreshing token: {}", e.getMessage());
-            throw new JwtAuthenticationException("Failed to refresh token", e);
-        }
-    }
 }

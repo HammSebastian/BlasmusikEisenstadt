@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.controller;
 
+import at.sebastianhamm.backend.dto.ChangePasswordRequest;
 import at.sebastianhamm.backend.dto.UserDto;
-import at.sebastianhamm.backend.model.User;
 import at.sebastianhamm.backend.security.CurrentUser;
 import at.sebastianhamm.backend.security.UserPrincipal;
 import at.sebastianhamm.backend.service.UserService;
@@ -9,8 +9,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,23 +26,23 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Tag(name = "User Management", description = "APIs for managing user accounts")
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user account")
     public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
-        
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/users/{id}")
                 .buildAndExpand(createdUser.getId()).toUri();
-        
+        logger.info("User registered with id {}", createdUser.getId());
         return ResponseEntity.created(location).body(createdUser);
     }
 
@@ -63,10 +67,10 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Change current user's password")
     public ResponseEntity<Void> changePassword(
-            @RequestParam String currentPassword,
-            @RequestParam String newPassword,
+            @Valid @RequestBody ChangePasswordRequest passwordRequest,
             @Parameter(hidden = true) @CurrentUser UserPrincipal currentUser) {
-        userService.changePassword(currentUser.getId(), currentPassword, newPassword);
+        userService.changePassword(currentUser.getId(), passwordRequest.getCurrentPassword(), passwordRequest.getNewPassword());
+        logger.info("Password changed for user id {}", currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -91,7 +95,7 @@ public class UserController {
     @Operation(summary = "Get all users (Admin only)")
     public ResponseEntity<Page<UserDto>> getAllUsers(
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok((Page<UserDto>) userService.getAllUsers(pageable));
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @GetMapping("/{id}")
@@ -115,6 +119,7 @@ public class UserController {
     @Operation(summary = "Delete user by ID")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        logger.info("User with id {} deleted", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -123,6 +128,7 @@ public class UserController {
     @Operation(summary = "Enable a user account (Admin only)")
     public ResponseEntity<Void> enableUser(@PathVariable Long id) {
         userService.enableUser(id);
+        logger.info("User with id {} enabled", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -131,6 +137,7 @@ public class UserController {
     @Operation(summary = "Disable a user account (Admin only)")
     public ResponseEntity<Void> disableUser(@PathVariable Long id) {
         userService.disableUser(id);
+        logger.info("User with id {} disabled", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -139,6 +146,7 @@ public class UserController {
     @Operation(summary = "Unlock a locked user account (Admin only)")
     public ResponseEntity<Void> unlockUser(@PathVariable Long id) {
         userService.unlockUser(id);
+        logger.info("User with id {} unlocked", id);
         return ResponseEntity.noContent().build();
     }
 }

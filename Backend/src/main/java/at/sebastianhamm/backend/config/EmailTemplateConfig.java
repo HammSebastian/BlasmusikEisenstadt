@@ -39,7 +39,8 @@ public class EmailTemplateConfig {
      *
      * @return the configured ITemplateResolver instance
      */
-    private ITemplateResolver htmlTemplateResolver() {
+    @Bean
+    public ITemplateResolver htmlTemplateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix(emailConfig.getTemplates().getPrefix());
         templateResolver.setSuffix(emailConfig.getTemplates().getSuffix());

@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,6 @@ public class GigResponse {
     private String title;
     private String description;
     private String location;
-    private String date;
+    private LocalDate date;
     private String time;
 }

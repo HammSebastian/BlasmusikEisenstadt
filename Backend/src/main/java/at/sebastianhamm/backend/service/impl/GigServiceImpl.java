@@ -1,6 +1,5 @@
 package at.sebastianhamm.backend.service.impl;
 
-import at.sebastianhamm.backend.BackendApplication;
 import at.sebastianhamm.backend.entity.GigEntity;
 import at.sebastianhamm.backend.exception.ConflictException;
 import at.sebastianhamm.backend.io.GigRequest;
@@ -9,9 +8,9 @@ import at.sebastianhamm.backend.repository.GigRepository;
 import at.sebastianhamm.backend.service.GigService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,124 +18,101 @@ import java.util.List;
 public class GigServiceImpl implements GigService {
 
     private final GigRepository gigRepository;
-
-    private final Logger logger = BackendApplication.getLogger();
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(GigServiceImpl.class);
 
     @Override
-    public GigResponse createGig(GigRequest gigRequest) {
-        if (gigRepository.existsByTitleIgnoreCase(gigRequest.getTitle())) {
-            logger.error("A gig with this title already exists (case-insensitive)");
-
-            throw new ConflictException("A gig with this title already exists (case-insensitive)");
+    public GigResponse createGig(GigRequest request) {
+        if (gigRepository.existsByTitleIgnoreCase(request.getTitle())) {
+            logger.error("Gig with title '{}' already exists", request.getTitle());
+            throw new ConflictException("Gig with this title already exists");
         }
-
-        GigEntity newGig = convertToGigEntity(gigRequest);
-        newGig = gigRepository.save(newGig);
-        GigResponse response = convertToGigResponse(newGig);
-
-        return response;
+        GigEntity entity = mapToEntity(request);
+        GigEntity saved = gigRepository.save(entity);
+        return mapToResponse(saved);
     }
 
     @Override
-    public GigResponse getGig(String title) {
-        GigEntity gig = gigRepository.findGigEntityByTitle(title)
-                .orElseThrow(() -> new RuntimeException("Gig not found with title: " + title));
-        return convertToGigResponse(gig);
-    }
-
-    @Override
-    public void deleteGig(String title) {
-        GigEntity gig = gigRepository.findGigEntityByTitle(title)
-                .orElseThrow(() -> new RuntimeException("Gig not found with title: " + title));
-        gigRepository.delete(gig);
-    }
-
-    @Override
-    public GigResponse updateGig(GigRequest gigRequest) {
-        GigEntity gig = gigRepository.findGigEntityByTitle(gigRequest.getTitle())
-                .orElseThrow(() -> new RuntimeException("Gig not found with title: " + gigRequest.getTitle()));
-
-        gig.setDescription(gigRequest.getDescription());
-        gig.setLocation(gigRequest.getLocation());
-        gig.setDate(gigRequest.getDate());
-        gig.setStartTime(gigRequest.getStartTime());
-        gig.setEndTime(gigRequest.getEndTime());
-
-        gigRepository.save(gig);
-        return convertToGigResponse(gig);
+    public GigResponse getGigById(Long id) {
+        return gigRepository.findGigEntityById(id);
     }
 
     @Override
     public List<GigResponse> getAllGigs() {
         return gigRepository.findAll().stream()
-                .map(this::convertToGigResponse)
+                .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Override
+    public List<GigResponse> getGigsByDate(LocalDate date) {
+        return gigRepository.findGigEntitiesByDate(date).stream()
+                .map(this::mapToResponse)
+                .toList();
+
+    }
+
+    @Override
+    public List<GigResponse> getGigsBetweenDates(LocalDate startDate, LocalDate endDate) {
+        return gigRepository.findGigEntitiesByDateBetween(startDate, endDate).stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public GigResponse updateGig(Long id, GigRequest request) {
+        GigEntity gig = gigRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gig not found with id: " + id));
+
+        gig.setTitle(request.getTitle());
+        gig.setDescription(request.getDescription());
+        gig.setLocation(request.getLocation());
+        gig.setDate(request.getDate());
+        gig.setStartTime(request.getStartTime());
+        gig.setEndTime(request.getEndTime());
+
+        GigEntity updated = gigRepository.save(gig);
+        return mapToResponse(updated);
+    }
+
+    @Override
+    public void deleteGigById(Long id) {
+        if (!gigRepository.existsById(id)) {
+            throw new RuntimeException("Gig not found with id: " + id);
+        }
+        gigRepository.deleteById(id);
     }
 
     @Override
     public List<GigResponse> getGigsByLocation(String location) {
-        return gigRepository.findGigEntitiesByLocation(location).stream()
-                .map(this::convertToGigResponse)
-                .toList();
+        return gigRepository.findGigEntitiesByLocation(location).stream().map(this::mapToResponse).toList();
     }
 
-    @Override
-    public List<GigResponse> getGigsByDate(String date) {
-        return gigRepository.findGigEntitiesByDate(date).stream()
-                .map(this::convertToGigResponse)
-                .toList();
+    private GigEntity mapToEntity(GigRequest req) {
+        if (req == null) throw new IllegalArgumentException("GigRequest must not be null");
+        return GigEntity.builder()
+                .title(req.getTitle())
+                .description(req.getDescription())
+                .location(req.getLocation())
+                .date(req.getDate())
+                .startTime(req.getStartTime())
+                .endTime(req.getEndTime())
+                .build();
     }
 
-    private GigEntity convertToGigEntity(GigRequest gigRequest) {
-        if (gigRequest == null) {
-            System.out.println("Error: GigRequest is null");
-            return null;
-        }
-
-        System.out.println("Converting GigRequest to GigEntity");
-        System.out.println("Title: " + gigRequest.getTitle());
-        System.out.println("Description: " + gigRequest.getDescription());
-        System.out.println("Location: " + gigRequest.getLocation());
-        System.out.println("Date: " + gigRequest.getDate());
-        System.out.println("Start Time: " + gigRequest.getStartTime());
-        System.out.println("End Time: " + gigRequest.getEndTime());
-
-        try {
-            GigEntity entity = GigEntity.builder()
-                    .title(gigRequest.getTitle())
-                    .description(gigRequest.getDescription())
-                    .location(gigRequest.getLocation())
-                    .date(gigRequest.getDate())
-                    .startTime(gigRequest.getStartTime())
-                    .endTime(gigRequest.getEndTime())
-                    .build();
-            System.out.println("Successfully created GigEntity");
-            return entity;
-        } catch (Exception e) {
-            System.out.println("Error creating GigEntity: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    private GigResponse convertToGigResponse(GigEntity gig) {
-        if (gig == null) {
-            return null;
-        }
-
-        // Format time as "HH:mm - HH:mm" if both start and end times are present
-        String time = gig.getStartTime();
-        if (gig.getStartTime() != null && gig.getEndTime() != null) {
-            time = gig.getStartTime() + " - " + gig.getEndTime();
+    private GigResponse mapToResponse(GigEntity entity) {
+        String time = null;
+        if (entity.getStartTime() != null && entity.getEndTime() != null) {
+            time = entity.getStartTime() + " - " + entity.getEndTime();
+        } else if (entity.getStartTime() != null) {
+            time = entity.getStartTime().toString();
         }
 
         return GigResponse.builder()
-                .id(gig.getId())
-                .title(gig.getTitle())
-                .description(gig.getDescription())
-                .location(gig.getLocation())
-                .date(gig.getDate())
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .description(entity.getDescription())
+                .location(entity.getLocation())
+                .date(entity.getDate())
                 .time(time)
                 .build();
     }

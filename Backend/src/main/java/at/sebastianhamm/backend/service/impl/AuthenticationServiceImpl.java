@@ -4,28 +4,24 @@ import at.sebastianhamm.backend.dto.AuthenticationRequest;
 import at.sebastianhamm.backend.dto.AuthenticationResponse;
 import at.sebastianhamm.backend.dto.UserDto;
 import at.sebastianhamm.backend.exception.ResourceNotFoundException;
+import at.sebastianhamm.backend.model.Role;
 import at.sebastianhamm.backend.model.User;
 import at.sebastianhamm.backend.repository.UserRepository;
-import at.sebastianhamm.backend.security.JwtService;
+import at.sebastianhamm.backend.security.jwt.JwtService;
 import at.sebastianhamm.backend.service.AuthenticationService;
 import at.sebastianhamm.backend.service.EmailService;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User admin = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Admin not found"));
         
-        if (!User.Role.ROLE_ADMIN.equals(admin.getRole())) {
+        if (!Role.ADMIN.equals(admin.getRole())) {
             throw new SecurityException("Only admins can register new users");
         }
 
@@ -58,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(passwordEncoder.encode("temporaryPassword")) // Will be changed on first login
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
-                .role(userDto.getRole() != null ? userDto.getRole() : User.Role.ROLE_USER)
+                .role(userDto.getRole() != null ? userDto.getRole() : Role.USER)
                 .enabled(true)
                 .otpEnabled(true)
                 .emailNotifications(true)

@@ -1,5 +1,6 @@
 package at.sebastianhamm.backend.dto;
 
+import at.sebastianhamm.backend.model.Role;
 import at.sebastianhamm.backend.model.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,7 +53,7 @@ public class UserDto {
     private String lastName;
 
     @Schema(description = "User's role", example = "ROLE_USER")
-    private User.Role role;
+    private Role role;
 
     @Schema(description = "Whether the user account is enabled", example = "true")
     private boolean enabled;
@@ -132,8 +133,8 @@ public class UserDto {
                 .lockTime(user.getLockTime())
                 .lastLogin(user.getLastLogin())
                 .lastPasswordResetDate(user.getLastPasswordResetDate())
-                .createdAt(user.getCreatedAt().toLocalDateTime())
-                .updatedAt(user.getUpdatedAt().toLocalDateTime())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 
@@ -149,7 +150,7 @@ public class UserDto {
                 .password(this.password) // Should be encoded before saving
                 .firstName(this.firstName)
                 .lastName(this.lastName)
-                .role(this.role != null ? this.role : User.Role.ROLE_USER)
+                .role(this.role != null ? this.role : Role.USER)
                 .enabled(this.enabled)
                 .accountNonLocked(this.accountNonLocked)
                 .otpEnabled(this.otpEnabled)

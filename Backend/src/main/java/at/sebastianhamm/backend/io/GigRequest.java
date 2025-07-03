@@ -1,15 +1,14 @@
 package at.sebastianhamm.backend.io;
 
-import at.sebastianhamm.backend.entity.LocationEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -25,13 +24,13 @@ public class GigRequest {
     @NotBlank(message = "Location is required")
     private String location;
 
-    @NotBlank(message = "Date is required")
+    @NotNull(message = "Date is required")
     @JsonFormat(pattern = "dd.MM.yyyy")
-    private String date;
+    private LocalDate date;
 
     @NotBlank(message = "Start time is required")
-    private String startTime;
+    private LocalTime startTime;
 
     @NotBlank(message = "End time is required")
-    private String endTime;
+    private LocalTime endTime;
 }

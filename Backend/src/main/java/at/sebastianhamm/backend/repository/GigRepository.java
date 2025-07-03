@@ -1,23 +1,29 @@
 package at.sebastianhamm.backend.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import at.sebastianhamm.backend.entity.GigEntity;
+import at.sebastianhamm.backend.io.GigResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface GigRepository extends JpaRepository<GigEntity, Long> {
 
-    Optional<GigEntity> findGigEntityByTitle(String title);
+    Optional<GigEntity> findByTitleIgnoreCase(String title);
 
-    boolean existsByTitle(String title);
-    
-    @Query("SELECT COUNT(g) > 0 FROM GigEntity g WHERE LOWER(g.title) = LOWER(:title)")
-    boolean existsByTitleIgnoreCase(@Param("title") String title);
+    boolean existsByTitleIgnoreCase(String title);
+
+    List<GigEntity> findByLocation(String location);
+
+    List<GigEntity> findByDate(LocalDate date);
+
+    List<GigEntity> findGigEntitiesByDate(LocalDate date);
+
+    List<GigEntity> findGigEntitiesByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<GigEntity> findGigEntitiesByLocation(String location);
 
-    List<GigEntity> findGigEntitiesByDate(String date);
+    GigResponse findGigEntityById(Long id);
 }

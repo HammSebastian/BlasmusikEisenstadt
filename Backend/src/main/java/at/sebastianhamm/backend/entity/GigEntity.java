@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "tbl_gigs")
@@ -20,10 +21,18 @@ public class GigEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
+
     private String description;
+
+    @Column(nullable = false)
     private String location;
-    private String date;
-    private String startTime;
-    private String endTime;
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    private LocalTime startTime;
+
+    private LocalTime endTime;
 }

@@ -2,6 +2,7 @@ package at.sebastianhamm.backend.service;
 
 import at.sebastianhamm.backend.dto.UserDto;
 import at.sebastianhamm.backend.exception.ResourceNotFoundException;
+import at.sebastianhamm.backend.model.Role;
 import at.sebastianhamm.backend.model.User;
 import at.sebastianhamm.backend.repository.UserRepository;
 import at.sebastianhamm.backend.security.SecurityConstants;
@@ -67,7 +68,7 @@ public class UserService implements UserDetailsService {
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
-                .role(User.Role.ROLE_USER)
+                .role(Role.USER)
                 .enabled(false)
                 .otpEnabled(true)
                 .emailNotifications(true)
@@ -245,8 +246,8 @@ public class UserService implements UserDetailsService {
                 .accountNonLocked(user.isAccountNonLocked())
                 .otpEnabled(user.isOtpEnabled())
                 .emailNotifications(user.isEmailNotifications())
-                .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toLocalDateTime() : null)
-                .updatedAt(user.getUpdatedAt() != null ? user.getUpdatedAt().toLocalDateTime() : null)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 

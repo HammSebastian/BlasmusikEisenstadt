@@ -3,22 +3,24 @@ package at.sebastianhamm.backend.service;
 import at.sebastianhamm.backend.io.GigRequest;
 import at.sebastianhamm.backend.io.GigResponse;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface GigService {
 
-    GigResponse createGig(GigRequest gigRequest);
+    GigResponse createGig(GigRequest request);
 
-    GigResponse getGig(String title);
-
-    void deleteGig(String title);
-
-    GigResponse updateGig(GigRequest gigRequest);
+    GigResponse getGigById(Long id);
 
     List<GigResponse> getAllGigs();
 
-    List<GigResponse> getGigsByLocation(String location);
+    List<GigResponse> getGigsByDate(LocalDate date);
 
-    List<GigResponse> getGigsByDate(String date);
+    List<GigResponse> getGigsBetweenDates(LocalDate startDate, LocalDate endDate);
+
+    GigResponse updateGig(Long id, GigRequest request);
+
+    void deleteGigById(Long id);
+
+    List<GigResponse> getGigsByLocation(String location);
 }

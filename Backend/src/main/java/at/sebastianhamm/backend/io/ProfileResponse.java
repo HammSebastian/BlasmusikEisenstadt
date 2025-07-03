@@ -1,6 +1,5 @@
 package at.sebastianhamm.backend.io;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +13,5 @@ public class ProfileResponse {
     private String userId;
     private String name;
     private String email;
-    private Boolean isAccountVerified;
+    private boolean accountVerified; // primitive boolean, nicht Boolean
 }

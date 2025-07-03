@@ -13,45 +13,54 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Represents the currently authenticated user in the security context.
- * Implements Spring Security's UserDetails interface.
- */
+import at.sebastianhamm.backend.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+
 @Getter
-@EqualsAndHashCode
-public class UserPrincipal implements UserDetails {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class UserPrincipal implements UserDetails, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @EqualsAndHashCode.Include
     private final Long id;
     private final String email;
+
     @JsonIgnore
     private final String password;
     private final boolean enabled;
+    private final boolean accountNonLocked;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(Long id, String email, String password, boolean enabled,
-                        Collection<? extends GrantedAuthority> authorities) {
+                         boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.enabled = enabled;
+        this.accountNonLocked = accountNonLocked;
         this.authorities = authorities;
     }
 
-    /**
-     * Creates a UserPrincipal from a User entity.
-     *
-     * @param user the User entity
-     * @return a new UserPrincipal instance
-     */
     public static UserPrincipal create(User user) {
-        List<GrantedAuthority> authorities = user.getAuthorities().stream()
+        List<SimpleGrantedAuthority> authorities = user.getAuthorities().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
-                .collect(Collectors.toList());
+                .toList();
 
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.isEnabled(),
+                user.isAccountNonLocked(),
                 authorities
         );
     }
@@ -68,7 +77,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Account lock status is checked in the authentication filter
+        return accountNonLocked;
     }
 
     @Override
@@ -79,23 +88,5 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    /**
-     * Gets the user's ID.
-     *
-     * @return the user ID
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Gets the user's email.
-     *
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
     }
 }

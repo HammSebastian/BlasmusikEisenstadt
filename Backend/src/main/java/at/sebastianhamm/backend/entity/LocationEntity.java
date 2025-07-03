@@ -18,10 +18,17 @@ public class LocationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
     private String address;
+
     private String city;
+
     private String state;
+
+    @Column(name = "zip_code")
     private String zipCode;
+
     private String country;
 }

@@ -14,8 +14,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,239 +31,160 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.email.from}")
     private String fromEmail;
 
-    @Value("${app.url}")
-    private String appUrl;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
+    @Value("${app.email.admin-email}")
+    private String adminEmail;
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Async
     @Override
     public void sendWelcomeEmail(User user) {
-        if (user == null || user.getEmail() == null) {
-            throw new IllegalArgumentException("User and user email must not be null");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/welcome", ctx);
-
-            sendEmail(user.getEmail(), "Willkommen bei Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Welcome email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send welcome email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send welcome email", e);
-        }
-    }
-
-    @Async
-    @Override
-    public void sendOtpEmail(User user, String otpCode) {
-        if (user == null || user.getEmail() == null || otpCode == null || otpCode.trim().isEmpty()) {
-            throw new IllegalArgumentException("User, user email and OTP code must not be null or empty");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("otpCode", otpCode);
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/otp", ctx);
-
-            sendEmail(user.getEmail(), "Ihr Einmalpasswort für Blasmusik Eisenstadt", htmlContent, true);
-            log.info("OTP email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send OTP email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send OTP email", e);
-        }
-    }
-
-    @Async
-    @Override
-    public void sendPasswordResetEmail(User user, String resetToken) {
-        if (user == null || user.getEmail() == null || resetToken == null || resetToken.trim().isEmpty()) {
-            throw new IllegalArgumentException("User, user email and reset token must not be null or empty");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("resetUrl", appUrl + "/reset-password?token=" + resetToken);
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/password-reset", ctx);
-
-            sendEmail(user.getEmail(), "Passwort zurücksetzen - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Password reset email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send password reset email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send password reset email", e);
-        }
+        validateUser(user);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("frontendUrl", frontendUrl);
+        sendTemplatedEmail(user.getEmail(), "Willkommen bei Blasmusik Eisenstadt", "emails/welcome-email", vars);
     }
 
     @Async
     @Override
     public void sendVerificationEmail(User user, String verificationToken) {
-        if (user == null || user.getEmail() == null || verificationToken == null || verificationToken.trim().isEmpty()) {
-            throw new IllegalArgumentException("User, user email and verification token must not be null or empty");
-        }
+        validateUserAndToken(user, verificationToken);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("verificationUrl", frontendUrl + "/verify-email?token=" + verificationToken);
+        sendTemplatedEmail(user.getEmail(), "Bitte bestätigen Sie Ihre E-Mail-Adresse", "emails/verification-email", vars);
+    }
 
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("verificationUrl", appUrl + "/verify-email?token=" + verificationToken);
-            ctx.setVariable("appUrl", appUrl);
+    @Async
+    @Override
+    public void sendOtpEmail(User user, String otpCode) {
+        validateUserAndToken(user, otpCode);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("otpCode", otpCode);
+        sendTemplatedEmail(user.getEmail(), "Ihr Einmalpasswort", "emails/otp-email", vars);
+    }
 
-            final String htmlContent = templateEngine.process("emails/verification", ctx);
-
-            sendEmail(user.getEmail(), "Bitte bestätigen Sie Ihre E-Mail-Adresse - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Verification email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send verification email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send verification email", e);
-        }
+    @Async
+    @Override
+    public void sendPasswordResetEmail(User user, String resetToken) {
+        validateUserAndToken(user, resetToken);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("resetUrl", frontendUrl + "/reset-password?token=" + resetToken);
+        sendTemplatedEmail(user.getEmail(), "Passwort zurücksetzen", "emails/password-reset-email", vars);
     }
 
     @Async
     @Override
     public void sendAccountLockedEmail(User user) {
-        if (user == null || user.getEmail() == null) {
-            throw new IllegalArgumentException("User and user email must not be null");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/account-locked", ctx);
-
-            sendEmail(user.getEmail(), "Ihr Konto wurde gesperrt - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Account locked email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send account locked email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send account locked email", e);
-        }
+        validateUser(user);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        sendTemplatedEmail(user.getEmail(), "Konto gesperrt", "emails/account-locked-email", vars);
     }
 
     @Async
     @Override
     public void sendAccountUnlockedEmail(User user) {
-        if (user == null || user.getEmail() == null) {
-            throw new IllegalArgumentException("User and user email must not be null");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/account-unlocked", ctx);
-
-            sendEmail(user.getEmail(), "Ihr Konto wurde entsperrt - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Account unlocked email sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send account unlocked email to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send account unlocked email", e);
-        }
+        validateUser(user);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        sendTemplatedEmail(user.getEmail(), "Konto entsperrt", "emails/account-unlocked-email", vars);
     }
 
     @Async
     @Override
     public void sendNewLoginAlert(User user, String deviceInfo, String locationInfo) {
-        if (user == null || user.getEmail() == null) {
-            throw new IllegalArgumentException("User and user email must not be null");
-        }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("deviceInfo", deviceInfo != null ? deviceInfo : "Unbekanntes Gerät");
-            ctx.setVariable("locationInfo", locationInfo != null ? locationInfo : "Unbekannter Standort");
-            ctx.setVariable("timestamp", new Date());
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/new-login-alert", ctx);
-
-            sendEmail(user.getEmail(), "Neue Anmeldung erkannt - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("New login alert sent to {}", user.getEmail());
-        } catch (Exception e) {
-            log.error("Failed to send new login alert to {}", user.getEmail(), e);
-            throw new RuntimeException("Failed to send new login alert", e);
-        }
+        validateUser(user);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("deviceInfo", deviceInfo != null ? deviceInfo : "Unbekanntes Gerät");
+        vars.put("locationInfo", locationInfo != null ? locationInfo : "Unbekannter Standort");
+        vars.put("loginTime", DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now()));
+        sendTemplatedEmail(user.getEmail(), "Neue Anmeldung erkannt", "emails/new-login-alert-email", vars);
     }
 
     @Async
     @Override
-    public void sendEventNotification(User user, String eventTitle, String eventDate,
-                                     String eventLocation, String additionalInfo) {
-        if (user == null || user.getEmail() == null || eventTitle == null || eventTitle.trim().isEmpty() ||
-            eventDate == null || eventDate.trim().isEmpty()) {
-            throw new IllegalArgumentException("User, user email, event title and event date must not be null or empty");
+    public void sendEventNotification(User user, String eventTitle, String eventDate, String eventLocation, String additionalInfo) {
+        validateUser(user);
+        if (eventTitle == null || eventTitle.isBlank() || eventDate == null || eventDate.isBlank()) {
+            throw new IllegalArgumentException("Event title and date must not be null or empty");
         }
-
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("name", user.getFirstName() + " " + user.getLastName());
-            ctx.setVariable("eventTitle", eventTitle);
-            ctx.setVariable("eventDate", eventDate);
-            ctx.setVariable("eventLocation", eventLocation != null ? eventLocation : "Nicht angegeben");
-            ctx.setVariable("additionalInfo", additionalInfo != null ? additionalInfo : "");
-            ctx.setVariable("appUrl", appUrl);
-
-            final String htmlContent = templateEngine.process("emails/event-notification", ctx);
-
-            sendEmail(user.getEmail(), "Anstehende Veranstaltung: " + eventTitle + " - Blasmusik Eisenstadt", htmlContent, true);
-            log.info("Event notification sent to {} for event: {}", user.getEmail(), eventTitle);
-        } catch (Exception e) {
-            log.error("Failed to send event notification to {} for event: {}", user.getEmail(), eventTitle, e);
-            throw new RuntimeException("Failed to send event notification", e);
-        }
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("name", user.getFullName());
+        vars.put("eventTitle", eventTitle);
+        vars.put("eventDate", eventDate);
+        vars.put("eventLocation", eventLocation != null ? eventLocation : "Nicht angegeben");
+        vars.put("additionalInfo", additionalInfo != null ? additionalInfo : "");
+        sendTemplatedEmail(user.getEmail(), "Anstehende Veranstaltung: " + eventTitle, "emails/event-notification-email", vars);
     }
 
     @Async
     @Override
     public void sendSystemAlert(String subject, String message, String errorDetails) {
-        try {
-            final Context ctx = new Context(Locale.GERMAN);
-            ctx.setVariable("message", message);
-            ctx.setVariable("errorDetails", errorDetails != null ? errorDetails : "Keine weiteren Details verfügbar");
-            ctx.setVariable("timestamp", new Date());
-
-            final String htmlContent = templateEngine.process("emails/system-alert", ctx);
-
-            sendEmail(fromEmail, "[SYSTEM ALERT] " + subject, htmlContent, true);
-            log.info("System alert email sent to admin");
-        } catch (Exception e) {
-            log.error("Failed to send system alert email", e);
-            throw new RuntimeException("Failed to send system alert email", e);
+        if (adminEmail == null || adminEmail.isBlank()) {
+            log.warn("Admin email nicht konfiguriert, Systemalert wird nicht versendet");
+            return;
         }
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("subject", subject);
+        vars.put("message", message);
+        vars.put("errorDetails", errorDetails != null ? errorDetails : "Keine Details verfügbar");
+        vars.put("timestamp", DATE_TIME_FORMATTER.format(java.time.LocalDateTime.now()));
+        sendTemplatedEmail(adminEmail, "[System Alert] " + subject, "emails/system-alert-email", vars);
     }
 
     @Override
     public void sendEmail(String to, String subject, String content, boolean isHtml) {
-        if (to == null || to.trim().isEmpty() || subject == null || subject.trim().isEmpty() || content == null) {
-            throw new IllegalArgumentException("To, subject and content must not be null or empty");
+        if (to == null || to.isBlank() || subject == null || subject.isBlank() || content == null || content.isBlank()) {
+            throw new IllegalArgumentException("Email Parameter dürfen nicht null oder leer sein");
         }
-
         try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            message.setFrom(fromEmail);
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(content, isHtml);
-            
-            // Add inline images if needed
-            // FileSystemResource res = new FileSystemResource(new File("path/to/logo.png"));
-            // message.addInline("logo", res);
-            
-            mailSender.send(mimeMessage);
-            log.debug("Email sent to {} with subject: {}", to, subject);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, isHtml);
+            mailSender.send(message);
+            log.debug("Email gesendet an {}", to);
         } catch (MessagingException e) {
-            log.error("Failed to send email to {} with subject: {}", to, subject, e);
-            throw new RuntimeException("Failed to send email", e);
+            log.error("Fehler beim Senden der Email an {}", to, e);
+            throw new RuntimeException("Email senden fehlgeschlagen", e);
+        }
+    }
+
+    // --- Hilfsmethoden ---
+
+    private void validateUser(User user) {
+        if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("User und User Email dürfen nicht null oder leer sein");
+        }
+    }
+
+    private void validateUserAndToken(User user, String token) {
+        validateUser(user);
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("Token darf nicht null oder leer sein");
+        }
+    }
+
+    private void sendTemplatedEmail(String to, String subject, String templateName, Map<String, Object> variables) {
+        try {
+            Context ctx = new Context(Locale.GERMAN);
+            variables.forEach(ctx::setVariable);
+            String content = templateEngine.process(templateName, ctx);
+            sendEmail(to, subject, content, true);
+            log.info("Email gesendet an {} mit Betreff {}", to, subject);
+        } catch (Exception e) {
+            log.error("Fehler beim Verarbeiten der Email Vorlage {} für {}", templateName, to, e);
+            throw new RuntimeException("Email Vorlage Verarbeitung fehlgeschlagen", e);
         }
     }
 }

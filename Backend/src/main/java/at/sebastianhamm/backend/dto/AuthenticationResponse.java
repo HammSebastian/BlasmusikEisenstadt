@@ -25,4 +25,6 @@ public class AuthenticationResponse {
     private boolean requiresOtp;
     
     private UserDto user;
+
+    private boolean success;
 }

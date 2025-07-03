@@ -1,10 +1,12 @@
 package at.sebastianhamm.backend.model;
 
-/**
- * Role defines the different user roles in the system.
- */
 public enum Role {
-    ROLE_USER,
-    ROLE_ADMIN,
-    ROLE_MODERATOR
+    USER,
+    ADMIN,
+    MODERATOR;
+
+    @Override
+    public String toString() {
+        return "ROLE_" + name();
+    }
 }

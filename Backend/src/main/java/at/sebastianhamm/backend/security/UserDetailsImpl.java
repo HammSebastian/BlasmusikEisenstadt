@@ -18,42 +18,49 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private final Long id;
-    private final String username;
     private final String email;
-    private final String firstName;
-    private final String lastName;
-    
+
     @JsonIgnore
     private final String password;
+    private final String firstName;
+    private final String lastName;
     private final Collection<? extends GrantedAuthority> authorities;
     private final boolean enabled;
+    private final boolean accountNonLocked;
+    private final boolean accountNonExpired;
+    private final boolean credentialsNonExpired;
 
-    public UserDetailsImpl(Long id, String username, String email, String firstName, String lastName,
-                          String password, Collection<? extends GrantedAuthority> authorities, boolean enabled) {
+    public UserDetailsImpl(Long id, String email, String firstName, String lastName,
+                           String password, Collection<? extends GrantedAuthority> authorities,
+                           boolean enabled, boolean accountNonLocked, boolean accountNonExpired, boolean credentialsNonExpired) {
         this.id = id;
-        this.username = username;
         this.email = email;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.authorities = authorities;
         this.enabled = enabled;
+        this.accountNonLocked = accountNonLocked;
+        this.accountNonExpired = accountNonExpired;
+        this.credentialsNonExpired = credentialsNonExpired;
     }
 
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = user.getAuthorities().stream()
+        List<SimpleGrantedAuthority> authorities = user.getAuthorities().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getAuthority()))
-                .collect(Collectors.toList());
+                .toList();
 
         return new UserDetailsImpl(
                 user.getId(),
-                user.getEmail(),
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getPassword(),
                 authorities,
-                user.isEnabled()
+                user.isEnabled(),
+                user.isAccountNonLocked(),
+                user.isAccountNonExpired(),
+                user.isCredentialsNonExpired()
         );
     }
 
@@ -69,22 +76,22 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return accountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return credentialsNonExpired;
     }
 
     @Override
@@ -95,8 +102,12 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserDetailsImpl user = (UserDetailsImpl) o;
-        return Objects.equals(id, user.id);
+        if (!(o instanceof UserDetailsImpl that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

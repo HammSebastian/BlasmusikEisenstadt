@@ -1,9 +1,11 @@
 package at.sebastianhamm.backend.service.impl;
 
+import at.sebastianhamm.backend.model.Role;
 import at.sebastianhamm.backend.model.User;
 import at.sebastianhamm.backend.io.ProfileRequest;
 import at.sebastianhamm.backend.io.ProfileResponse;
 import at.sebastianhamm.backend.repository.UserRepository;
+import at.sebastianhamm.backend.service.EmailService;
 import at.sebastianhamm.backend.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -29,7 +30,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (userRepository.existsByEmail(profileRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
-        
+
         User newUser = convertToUser(profileRequest);
         newUser = userRepository.save(newUser);
         return convertToProfileResponse(newUser);
@@ -40,7 +41,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .userId(user.getUserId())
                 .name(user.getFullName())
                 .email(user.getEmail())
-                .isAccountVerified(user.isAccountVerified())
+                .accountVerified(user.isAccountVerified())
                 .build();
     }
 
@@ -50,11 +51,11 @@ public class ProfileServiceImpl implements ProfileService {
                 .firstName(extractFirstName(profileRequest.getName()))
                 .lastName(extractLastName(profileRequest.getName()))
                 .password(profileRequest.getPassword())
-                .role(User.Role.ROLE_USER)
+                .role(Role.USER)
                 .enabled(false)
                 .build();
     }
-    
+
     private String extractFirstName(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) {
             return "";
@@ -62,7 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
         String[] parts = fullName.trim().split("\\s+");
         return parts[0];
     }
-    
+
     private String extractLastName(String fullName) {
         if (fullName == null || fullName.trim().isEmpty()) {
             return "";
@@ -89,7 +90,7 @@ public class ProfileServiceImpl implements ProfileService {
         user = userRepository.save(user);
 
         try {
-            emailService.sendOtpEmail(String.valueOf(user), otp);
+            emailService.sendOtpEmail(user, otp);
         } catch (Exception e) {
             throw new RuntimeException("Failed to send OTP email", e);
         }
@@ -100,11 +101,11 @@ public class ProfileServiceImpl implements ProfileService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (user.getPasswordResetToken() != null && 
-            user.getPasswordResetToken().equals(otp) && 
-            user.getPasswordResetTokenExpiry() != null && 
+        if (user.getPasswordResetToken() != null &&
+            user.getPasswordResetToken().equals(otp) &&
+            user.getPasswordResetTokenExpiry() != null &&
             user.getPasswordResetTokenExpiry().isAfter(LocalDateTime.now())) {
-            
+
             user.setPassword(passwordEncoder.encode(newPassword));
             user.setPasswordResetToken(null);
             user.setPasswordResetTokenExpiry(null);
@@ -119,11 +120,11 @@ public class ProfileServiceImpl implements ProfileService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (user.getOtpSecret() != null && 
-            user.getOtpSecret().equals(otp) && 
-            user.getOtpExpiry() != null && 
+        if (user.getOtpSecret() != null &&
+            user.getOtpSecret().equals(otp) &&
+            user.getOtpExpiry() != null &&
             user.getOtpExpiry().isAfter(LocalDateTime.now())) {
-            
+
             user.setEnabled(true);
             user.setOtpSecret(null);
             user.setOtpExpiry(null);
@@ -157,7 +158,7 @@ public class ProfileServiceImpl implements ProfileService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (!user.getEmail().equals(profileRequest.getEmail()) && 
+        if (!user.getEmail().equals(profileRequest.getEmail()) &&
             userRepository.existsByEmail(profileRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }

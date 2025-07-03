@@ -11,6 +11,7 @@ import at.sebastianhamm.backend.security.jwt.JwtService;
 import at.sebastianhamm.backend.service.AuthenticationService;
 import at.sebastianhamm.backend.service.UserDetailsServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -22,10 +23,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
-
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -37,47 +36,36 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody AuthenticationRequest request) {
         try {
-            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    request.getEmail(),
-                    request.getPassword()
-                )
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-            // Check if OTP is required
             User user = userDetailsService.getUserByEmail(userDetails.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-            if (user.isOtpEnabled() && request.getOtp() == null) {
-                // OTP is required but not provided
-                return ResponseEntity.ok(AuthenticationResponse.builder()
-                    .requiresOtp(true)
-                    .build());
-            }
-
-            // If OTP is enabled, verify it
             if (user.isOtpEnabled()) {
-                AuthenticationRequest authRequest = new AuthenticationRequest(user.getEmail(), request.getOtp());
-                AuthenticationResponse response = authService.verifyOtp(authRequest);
-
+                if (request.getOtp() == null) {
+                    return ResponseEntity.ok(AuthenticationResponse.builder().requiresOtp(true).build());
+                }
+                AuthenticationResponse otpResponse = authService.verifyOtp(new AuthenticationRequest(user.getEmail(), request.getOtp()));
+                if (!otpResponse.isSuccess()) {
+                    return ResponseEntity.badRequest().body("Invalid OTP");
+                }
             }
 
-            // Generate tokens
-            String jwtToken = jwtService.generateJwtToken(authentication);
+            String jwtToken = jwtService.generateToken(authentication);
             String refreshToken = jwtService.generateRefreshToken(authentication);
-            
-            // Create HTTP-only cookie for refresh token
-            ResponseCookie jwtCookie = createJwtCookie(jwtToken);
-            ResponseCookie refreshCookie = createRefreshCookie(refreshToken);
+
+            ResponseCookie jwtCookie = createCookie("jwtToken", jwtToken, "/", 24 * 60 * 60);
+            ResponseCookie refreshCookie = createCookie("refreshToken", refreshToken, "/api/auth/refresh-token", 7 * 24 * 60 * 60);
 
             return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(createAuthResponse(user, jwtToken, refreshToken));
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(createAuthResponse(user, jwtToken, refreshToken));
 
         } catch (Exception e) {
             throw new BadRequestException("Login failed: " + e.getMessage());
@@ -88,31 +76,27 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         try {
             String refreshToken = getRefreshTokenFromRequest(request);
-            if (refreshToken == null || !jwtService.validateJwtToken(refreshToken)) {
+            if (refreshToken == null || !jwtService.validateToken(refreshToken)) {
                 throw new BadRequestException("Invalid refresh token");
             }
 
-            String username = jwtService.getUserNameFromJwtToken(refreshToken);
+            String username = jwtService.getUsernameFromToken(refreshToken);
             UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
-            
-            // Generate new tokens
-            String newJwtToken = jwtService.generateTokenFromUsername(username);
-            String newRefreshToken = jwtService.generateRefreshToken(
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
 
-            // Create HTTP-only cookies
-            ResponseCookie jwtCookie = createJwtCookie(newJwtToken);
-            ResponseCookie refreshCookie = createRefreshCookie(newRefreshToken);
+            String newJwtToken = jwtService.generateToken(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+            String newRefreshToken = jwtService.generateRefreshToken(
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+
+            ResponseCookie jwtCookie = createCookie("jwtToken", newJwtToken, "/", 24 * 60 * 60);
+            ResponseCookie refreshCookie = createCookie("refreshToken", newRefreshToken, "/api/auth/refresh-token", 7 * 24 * 60 * 60);
+
+            User user = userDetailsService.getUserByEmail(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
             return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(createAuthResponse(
-                    userDetailsService.getUserByEmail(username)
-                        .orElseThrow(() -> new ResourceNotFoundException("User not found")),
-                    newJwtToken,
-                    newRefreshToken
-                ));
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(createAuthResponse(user, newJwtToken, newRefreshToken));
 
         } catch (Exception e) {
             throw new BadRequestException("Failed to refresh token: " + e.getMessage());
@@ -121,47 +105,37 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
-        // Create empty cookies to clear the tokens
-        ResponseCookie jwtCookie = ResponseCookie.from("jwtToken", "")
-            .httpOnly(true)
-            .secure(false)
-            .path("/")
-            .maxAge(0)
-            .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
-            .httpOnly(true)
-            .secure(false)
-            .path("/")
-            .maxAge(0)
-            .build();
+        ResponseCookie jwtCookie = createCookie("jwtToken", "", "/", 0);
+        ResponseCookie refreshCookie = createCookie("refreshToken", "", "/api/auth/refresh-token", 0);
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-            .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-            .body("You've been signed out!");
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body("You've been signed out!");
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(
             @Valid @RequestBody UserDto userDto,
             @RequestHeader("X-Admin-Email") String adminEmail) {
-        
+
         UserDto createdUser = authService.register(userDto, adminEmail);
         return ResponseEntity.ok(createdUser);
     }
 
     @PostMapping("/request-password-reset")
-    public void requestPasswordReset(@RequestParam String email) {
+    public ResponseEntity<Void> requestPasswordReset(@RequestParam String email) {
         authService.requestPasswordReset(email);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reset-password")
-    public void resetPassword(
+    public ResponseEntity<Void> resetPassword(
             @RequestParam String token,
             @RequestParam String newPassword) {
-        
+
         authService.resetPassword(token, newPassword);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/verify-otp")
@@ -171,66 +145,57 @@ public class AuthController {
     }
 
     @PostMapping("/request-otp")
-    public void requestNewOtp(@RequestParam String email) {
+    public ResponseEntity<Void> requestNewOtp(@RequestParam String email) {
         authService.requestNewOtp(email);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
         String email = authentication.getName();
-        
+
         UserDto userDto = authService.getCurrentUser(email);
         return ResponseEntity.ok(userDto);
     }
 
-    private ResponseCookie createJwtCookie(String token) {
-        return ResponseCookie.from("jwtToken", token)
-            .httpOnly(true)
-            .secure(false) // Set to true in production with HTTPS
-            .path("/")
-            .maxAge(24 * 60 * 60) // 1 day
-            .sameSite("Strict")
-            .build();
-    }
-
-    private ResponseCookie createRefreshCookie(String token) {
-        return ResponseCookie.from("refreshToken", token)
-            .httpOnly(true)
-            .secure(false) // Set to true in production with HTTPS
-            .path("/api/auth/refresh-token")
-            .maxAge(7 * 24 * 60 * 60) // 7 days
-            .sameSite("Strict")
-            .build();
+    private ResponseCookie createCookie(String name, String token, String path, int maxAgeSeconds) {
+        return ResponseCookie.from(name, token)
+                .httpOnly(true)
+                .secure(false) // Set to true in production with HTTPS
+                .path(path)
+                .maxAge(maxAgeSeconds)
+                .sameSite("Strict")
+                .build();
     }
 
     private String getRefreshTokenFromRequest(HttpServletRequest request) {
         String refreshToken = null;
-        
-        // Try to get from Authorization header first
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             refreshToken = authHeader.substring(7);
-        } 
-        // Then try to get from cookie
-        else if (request.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+        } else if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
                 if ("refreshToken".equals(cookie.getName())) {
                     refreshToken = cookie.getValue();
                     break;
                 }
             }
         }
-        
         return refreshToken;
     }
 
     private AuthenticationResponse createAuthResponse(User user, String jwtToken, String refreshToken) {
         return AuthenticationResponse.builder()
-            .accessToken(jwtToken)
-            .refreshToken(refreshToken)
-            .user(UserDto.fromUser(user))
-            .requiresOtp(false)
-            .build();
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
+                .user(UserDto.fromUser(user))
+                .requiresOtp(false)
+                .success(true)
+                .build();
     }
 }

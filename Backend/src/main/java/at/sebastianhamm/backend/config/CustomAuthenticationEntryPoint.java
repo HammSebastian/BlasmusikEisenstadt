@@ -14,16 +14,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthenticationEntryPoint.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        logger.warn("Unauthorized access attempt: {}", authException.getMessage());
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, ServletException {
+
+        logger.warn("Unauthorized access attempt from {} to {}: {}",
+                request.getRemoteAddr(),
+                request.getRequestURI(),
+                authException.getMessage());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
