@@ -8,6 +8,7 @@ import {AnnouncementsModel} from '../../core/models/public/announcements.model';
 import {DataService} from '../../core/services/public/data.service';
 import {GigModel} from '../../core/models/public/gig.model';
 import {MemberModel} from '../../core/models/public/member.model';
+import {AboutModel} from '../../core/models/public/about.model';
 
 @Component({
     selector: 'app-home',
@@ -21,6 +22,12 @@ export class Home implements OnInit {
     announcements: AnnouncementsModel[] = [];
     gigs: GigModel[] = [];
     members: MemberModel[] = [];
+    about: AboutModel = {
+        id: 1,
+        imageUrl: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=150',
+        story: '',
+        mission: [],
+    };
 
     private readonly seoService = inject(SeoService);
     protected readonly authService = inject(AuthService);
@@ -36,6 +43,7 @@ export class Home implements OnInit {
         this.loadAnnouncements();
         this.loadGigs();
         this.loadMembers();
+        this.loadAbout();
     }
 
     constructor(private readonly dataService: DataService) {
@@ -76,7 +84,24 @@ export class Home implements OnInit {
         });
     }
 
+    private loadAbout() {
+        this.dataService.loadAbout().subscribe(about => {
+            this.about = about.result;
+        });
+    }
+
     calculateYearsOfMusic() {
         return new Date().getFullYear() - 1874;
     }
+
+    aboutShort() {
+        if (!this.about.story) {
+            return 'Lade die Geschichte...';
+        }
+        return this.about.story
+            .split('\n')
+            .slice(0, 3)
+            .join('\n');
+    }
+
 }
