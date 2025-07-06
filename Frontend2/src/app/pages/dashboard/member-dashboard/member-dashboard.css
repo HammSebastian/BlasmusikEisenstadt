@@ -1,0 +1,84 @@
+/* Welcome header styles */
+.welcome-header {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl text-white p-6;
+}
+
+/* Stats grid */
+.stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+.stat-card {
+    @apply card text-center;
+}
+
+.stat-number {
+    @apply text-2xl font-bold mb-1;
+}
+
+.stat-label {
+    @apply text-secondary-600 text-sm;
+}
+
+/* Content grid */
+.content-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+/* Section titles */
+.section-title {
+    @apply text-lg font-semibold mb-4 flex items-center;
+}
+
+/* Announcement styles */
+.announcement-item {
+    @apply border-l-4 pl-3 py-2;
+}
+
+.announcement-title {
+    @apply font-medium text-secondary-900 text-sm;
+}
+
+.announcement-text {
+    @apply text-xs text-secondary-600 mt-1;
+}
+
+.announcement-date {
+    @apply text-xs text-secondary-500;
+}
+
+/* Event styles */
+.event-item {
+    @apply flex items-center space-x-3 p-3 rounded-lg;
+}
+
+.event-date {
+    @apply text-center;
+}
+
+.event-month {
+    @apply text-xs font-bold;
+}
+
+.event-day {
+    @apply text-lg font-bold;
+}
+
+.event-title {
+    @apply font-medium text-secondary-900 text-sm;
+}
+
+.event-details {
+    @apply text-xs text-secondary-600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-grid {
+        @apply grid-cols-2;
+    }
+
+    .content-grid {
+        @apply grid-cols-1;
+    }
+}

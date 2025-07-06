@@ -1,15 +1,15 @@
-import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
-import {catchError, throwError} from 'rxjs';
+import {HttpInterceptorFn, HttpErrorResponse} from '@angular/common/http';
 import {inject} from '@angular/core';
-import {NotificationService} from '../services/notification';
-
+import {throwError} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {NotificationService} from '../services/essentials/notification.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const notificationService = inject(NotificationService);
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
-            let errorMessage = 'An unexpected error occurred';
+            let errorMessage = 'Ein unbekannter Fehler ist aufgetreten.';
 
             if (error.error instanceof ErrorEvent) {
                 // Client-side error
@@ -18,19 +18,19 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 // Server-side error
                 switch (error.status) {
                     case 401:
-                        errorMessage = 'Unauthorized access';
+                        errorMessage = 'Nicht angemeldet';
                         break;
                     case 403:
-                        errorMessage = 'Access forbidden';
+                        errorMessage = 'Zugriff verweigert';
                         break;
                     case 404:
-                        errorMessage = 'Resource not found';
+                        errorMessage = 'Nicht gefunden';
                         break;
                     case 500:
-                        errorMessage = 'Internal server error';
+                        errorMessage = 'Interner Serverfehler';
                         break;
                     default:
-                        errorMessage = error.error?.message || errorMessage;
+                        errorMessage = error.error?.message ?? errorMessage;
                 }
             }
 

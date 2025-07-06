@@ -1,0 +1,155 @@
+<!-- Hero Section -->
+<section class="relative text-white h-screen">
+
+    <!-- Bild als Fullscreen Hintergrund -->
+    <div class="absolute inset-0 bg-cover bg-center z-0"
+         [ngStyle]="{'background-image': heroItems.length > 0 ? 'url(' + heroItems[0].imageUrl + ')' : ''}"></div>
+
+    <!-- Dunkles Overlay oben drauf -->
+    <div class="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+
+    <!-- Inhalt -->
+    <div class="relative z-20 h-full flex items-center justify-center px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-6xl mb-6">🎺</div>
+
+            @for (item of heroItems; track item.id) {
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-primary-100">
+                    {{ item.title }}
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-primary-100">
+                    {{ item.description }}
+                </p>
+            }
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a routerLink="/gigs" class="btn-primary bg-white text-primary-600 hover:bg-primary-50">
+                    View Upcoming Performances
+                </a>
+
+                @if (!authService.isAuthenticated()) {
+                    <a routerLink="/auth/login"
+                       class="btn-secondary border-white text-white hover:bg-white hover:text-primary-600">
+                        Member Login
+                    </a>
+                } @else {
+                    <a routerLink="/dashboard"
+                       class="btn-secondary border-white text-white hover:bg-white hover:text-primary-600">
+                        Go to Dashboard
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AnnouncementsModel Section -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8">K&uuml;rzliche Ank&uuml;ndigungen</h2>
+            <div class="space-y-6">
+                @if (announcements.length === 0) {
+                    <p class="text-lg text-secondary-600 text-center">
+                        Keine aktiven Ank&uuml;ndigungen
+                    </p>
+                } @else {
+                    @for (announcement of announcements; track announcement.id) {
+                        <div class="card border-l-4 border-primary-500">
+                            <div class="flex heroItems-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-secondary-900 mb-2">
+                                        {{ announcement.title }}
+                                    </h3>
+                                    <p class="text-secondary-600 mb-2">
+                                        {{ announcement.message }}
+                                    </p>
+                                    <span class="text-sm text-secondary-500">
+                                    {{ announcement.startDate | date: 'yyyy-MM-dd' }}
+                                </span>
+                                    @if (announcement.endDate !== null) {
+                                        <span class="text-sm text-secondary-500 ml-2">
+                                        - {{ announcement.endDate | date: 'yyyy-MM-dd' }}
+                                    </span>
+                                    }
+                                </div>
+                                <span class="text-xs text-secondary-500 whitespace-nowrap ml-4">
+                                {{ announcement.createdBy }}
+                            </span>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="py-12 bg-secondary-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8">Kommende Veranstaltungen</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card">
+                    <div class="text-center mb-4">
+                        <div class="text-2xl font-bold text-primary-600">MAR</div>
+                        <div class="text-3xl font-bold text-primary-700">15</div>
+                    </div>
+                    <h3 class="font-semibold text-secondary-900 mb-2">Spring Concert Rehearsal</h3>
+                    <p class="text-sm text-secondary-600 mb-2">Community Center</p>
+                    <p class="text-sm text-secondary-500">7:00 PM</p>
+                </div>
+
+                <div class="card">
+                    <div class="text-center mb-4">
+                        <div class="text-2xl font-bold text-accent-600">MAR</div>
+                        <div class="text-3xl font-bold text-accent-700">28</div>
+                    </div>
+                    <h3 class="font-semibold text-secondary-900 mb-2">Spring Concert</h3>
+                    <p class="text-sm text-secondary-600 mb-2">Town Hall</p>
+                    <p class="text-sm text-secondary-500">8:00 PM</p>
+                </div>
+
+                <div class="card">
+                    <div class="text-center mb-4">
+                        <div class="text-2xl font-bold text-yellow-600">APR</div>
+                        <div class="text-3xl font-bold text-yellow-700">12</div>
+                    </div>
+                    <h3 class="font-semibold text-secondary-900 mb-2">Easter Parade</h3>
+                    <p class="text-sm text-secondary-600 mb-2">Main Street</p>
+                    <p class="text-sm text-secondary-500">2:00 PM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-6">About Our Brass Band</h2>
+            <p class="text-lg text-secondary-600 mb-8">
+                Founded in 1985, Blasmusik has been bringing the joy of brass band music to our community for
+                nearly four decades.
+                Our dedicated musicians perform a wide range of repertoire, from traditional brass band classics
+                to contemporary arrangements.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary-600 mb-2">40+</div>
+                    <div class="text-secondary-600">Years of Music</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-accent-600 mb-2">25</div>
+                    <div class="text-secondary-600">Active Members</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-600 mb-2">50+</div>
+                    <div class="text-secondary-600">Annual Performances</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

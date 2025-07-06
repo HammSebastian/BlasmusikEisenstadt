@@ -1,0 +1,62 @@
+/* Cookie consent banner */
+.cookie-consent {
+  @apply fixed bottom-0 left-0 right-0 z-50 bg-secondary-900 text-white p-4 shadow-lg;
+}
+
+/* Content layout */
+.cookie-content {
+  @apply flex flex-col md:flex-row items-start md:items-center justify-between gap-4;
+}
+
+/* Text styling */
+.cookie-text {
+  @apply text-sm leading-relaxed;
+}
+
+.cookie-link {
+  @apply text-primary-300 hover:text-primary-200 underline;
+}
+
+/* Button container */
+.cookie-buttons {
+  @apply flex flex-col sm:flex-row gap-2 min-w-fit;
+}
+
+/* Button styles */
+.btn-essential {
+  @apply px-4 py-2 text-sm border border-secondary-600 text-secondary-300 hover:text-white hover:border-secondary-500 rounded-lg transition-colors duration-200;
+}
+
+.btn-accept {
+  @apply px-4 py-2 text-sm bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cookie-content {
+    @apply flex-col items-start;
+  }
+  
+  .cookie-buttons {
+    @apply w-full;
+  }
+  
+  .btn-essential,
+  .btn-accept {
+    @apply w-full;
+  }
+}
+
+/* Animation for entrance */
+.cookie-consent {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,223 @@
+<div class="min-h-screen bg-white">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-secondary-200">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a routerLink="/" class="flex items-center space-x-2">
+                        <span class="text-2xl">🎺</span>
+                        <span class="text-xl font-bold text-primary-600">LOGO</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8" aria-label="Main Navigation">
+                    <a routerLink="/"
+                       routerLinkActive="text-primary-600"
+                       class="text-secondary-700 hover:text-primary-600 transition-colors duration-200">
+                        Startseite
+                    </a>
+                    <a routerLink="/gigs"
+                       routerLinkActive="text-primary-600"
+                       class="text-secondary-700 hover:text-primary-600 transition-colors duration-200">
+                        Auftritte
+                    </a>
+                    <a routerLink="/members"
+                       routerLinkActive="text-primary-600"
+                       class="text-secondary-700 hover:text-primary-600 transition-colors duration-200">
+                        Mitglieder
+                    </a>
+                    <a routerLink="/about"
+                       routerLinkActive="text-primary-600"
+                       class="text-secondary-700 hover:text-primary-600 transition-colors duration-200">
+                        &Uuml;ber uns
+                    </a>
+                    <a routerLink="/youth"
+                       routerLinkActive="text-primary-600"
+                       class="text-secondary-700 hover:text-primary-600 transition-colors duration-200">
+                        Die Feuerspritzen
+                    </a>
+                </nav>
+
+                <!-- Auth Button -->
+                <div class="flex items-center space-x-4">
+                    @if (!authService.isAuthenticated()) {
+                        <a routerLink="/auth/login" class="btn-primary text-sm">
+                            Mitgliederlogin
+                        </a>
+                    } @else {
+                        <a routerLink="/member-dashboard" class="btn-primary text-sm">
+                            Dashboard
+                        </a>
+                    }
+
+                    <!-- Mobile menu button -->
+                    <button
+                        (click)="mobileMenuOpen.set(!mobileMenuOpen())"
+                        class="md:hidden p-2 rounded-lg text-secondary-600 hover:text-primary-600 hover:bg-secondary-50 transition-colors duration-200"
+                        aria-label="Toggle menu"
+                    >
+                        <svg class="w-6 h-6" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation -->
+            @if (mobileMenuOpen()) {
+                <div class="md:hidden py-4 border-t border-secondary-200">
+                    <nav class="flex flex-col space-y-2" aria-label="Mobile Navigation">
+                        <a routerLink="/"
+                           routerLinkActive="text-primary-600 bg-primary-50"
+                           (click)="mobileMenuOpen.set(false)"
+                           class="px-3 py-2 rounded-lg text-secondary-700 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-200">
+                            Startseite
+                        </a>
+                        <a routerLink="/gigs"
+                           routerLinkActive="text-primary-600 bg-primary-50"
+                           (click)="mobileMenuOpen.set(false)"
+                           class="px-3 py-2 rounded-lg text-secondary-700 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-200">
+                            Auftritte
+                        </a>
+                        <a routerLink="/members"
+                           routerLinkActive="text-primary-600 bg-primary-50"
+                           (click)="mobileMenuOpen.set(false)"
+                           class="px-3 py-2 rounded-lg text-secondary-700 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-200">
+                            Mitglieder
+                        </a>
+                        <a routerLink="/about"
+                           routerLinkActive="text-primary-600 bg-primary-50"
+                           (click)="mobileMenuOpen.set(false)"
+                           class="px-3 py-2 rounded-lg text-secondary-700 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-200">
+                            &Uuml;ber uns
+                        </a>
+                        <a routerLink="/youth"
+                           routerLinkActive="text-primary-600 bg-primary-50"
+                           (click)="mobileMenuOpen.set(false)"
+                           class="px-3 py-2 rounded-lg text-secondary-700 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-200">
+                            Die Feuerspritzen
+                        </a>
+                    </nav>
+                </div>
+            }
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <ng-content></ng-content>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-secondary-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="text-2xl">🎺</span>
+                        <span class="text-xl font-bold">LOGO</span>
+                    </div>
+                    <p class="text-secondary-300 text-sm leading-relaxed">
+                        Wir bereiten Freunde mit unseren Konzert, Marsch und Polka St&uuml;cken. <br>
+                        Seien Sie beim n&auml;chsten Auftritt dabei!
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-semibold mb-4 text-white">Schnelle Links</h3>
+                    <nav class="flex flex-col space-y-2" aria-label="Quick Links">
+                        <a routerLink="/"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            Startseite
+                        </a>
+                        <a routerLink="/gigs"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            Auftritte
+                        </a>
+                        <a routerLink="/members"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            Mitglieder
+                        </a>
+                        <a routerLink="/about"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            &Uuml;ber uns
+                        </a>
+                        <a routerLink="/youth"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            Die Feuerspritzen
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h3 class="font-semibold mb-4">Support Us</h3>
+                    <nav class="flex flex-col space-y-2" aria-label="Support Links">
+                        <a href="mailto:spenden@stadtkapelle-eisenstadt.at"
+                           class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                            Spendenlink <strong style="color: #ff0000">🔴 (FREIWILLIG)</strong>
+                        </a>
+                        @if (!authService.isAuthenticated()) {
+                            <a routerLink="/auth/login"
+                               class="text-secondary-300 hover:text-white text-sm transition-colors duration-200">
+                                Mitgliederlogin
+                            </a>
+                        }
+                    </nav>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h3 class="font-semibold mb-4">Contact</h3>
+                    <div class="space-y-2 text-sm text-secondary-300">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 mr-2" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <a href="mailto:info@stadtkapelle-eisenstadt.at"
+                               class="hover:text-white transition-colors duration-200">
+                                info&commat;stadtkapelle-eisenstadt.at
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-secondary-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <iframe title="Google Maps" aria-label="Google Maps"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1062.6171956371063!2d16.535783793172786!3d47.8468113131326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c4822727517fb%3A0x3eb6cae910e906c3!2sFreiwillige%20Stadtfeuerwehr%20Eisenstadt!5e0!3m2!1sde!2sat!4v1751801591915!5m2!1sde!2sat"
+                    width="1920" height="600" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+
+            <!-- Bottom Footer -->
+            <div class="border-t border-secondary-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="text-sm text-secondary-400 mb-4 md:mb-0">
+                    © 2025 Stadtkapelle Eisenstadt - Alle Rechte vorbehalten
+                </div>
+                <div class="text-sm text-secondary-400 mb-4 md:mb-0">
+                    Erstellt von <a href="https://www.sebastianhamm.com" target="_blank" class="hover:text-white transition-colors duration-200">Sebastian Hamm</a>
+                </div>
+                <nav class="flex space-x-6 text-sm" aria-label="Footer Navigation">
+                    <a routerLink="/imprint"
+                       class="text-secondary-400 hover:text-white transition-colors duration-200">
+                        Impressum
+                    </a>
+                    <a routerLink="/privacy"
+                       class="text-secondary-400 hover:text-white transition-colors duration-200">
+                        Datenschutzerkl&auml;rung
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notifications -->
+    <app-notification></app-notification>
+</div>

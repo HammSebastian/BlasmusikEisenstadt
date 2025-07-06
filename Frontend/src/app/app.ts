@@ -1,29 +1,29 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
-import {SeoService} from './core/services/seo';
-import {AuthService} from './core/services/auth';
-import {Layout} from './components/shared/layout/layout';
+import {Component, inject, OnInit} from '@angular/core';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {CookieConsent} from './essentials/cookie-consent/cookie-consent';
+import {AuthService} from './core/services/essentials/auth.service';
+import {filter} from 'rxjs';
+import {SeoService} from './core/services/essentials/seo.service';
+import {Layout} from './essentials/layout/layout';
+import {MemberLayout} from './essentials/member-layout/member-layout';
 
 @Component({
-  selector: 'app-root',
-    imports: [CommonModule, RouterOutlet, Layout],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+    selector: 'app-root',
+    imports: [RouterOutlet, CookieConsent, Layout, MemberLayout],
+    templateUrl: './app.html',
+    styleUrl: './app.css'
 })
 export class App implements OnInit {
-    private seoService = inject(SeoService);
-    private router = inject(Router);
+    private readonly seoService = inject(SeoService);
+    private readonly router = inject(Router);
     protected authService = inject(AuthService);
 
     ngOnInit(): void {
         // Set default meta tags
         this.seoService.updateMetaTags({
-            title: 'Blasmusik - Brass Band Management',
-            description: 'Professional brass band management system for performances, members, and events.',
-            keywords: 'brass band, music, performances, management, events',
-            ogImage: '/assets/images/og-image.jpg'
+            title: 'Stadt- & Feuerwehrkapelle Eisenstadt',
+            description: 'Offizielle Website der Stadt- & Feuerwehrkapelle Eisenstadt.',
+            keywords: 'blasmusik, eisenstadt, musikverein, feuerwehrkapelle, stadtkapelle, konzerte, burgenland, musik, termine'
         });
 
         // Update meta tags on route changes
@@ -32,5 +32,9 @@ export class App implements OnInit {
             .subscribe(() => {
                 // Additional route-specific SEO handling can be added here
             });
+    }
+
+    protected isPublicRoute(): boolean {
+        return !this.router.url.startsWith('/member') && !this.router.url.startsWith('/admin');
     }
 }

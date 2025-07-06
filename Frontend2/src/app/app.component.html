@@ -1,0 +1,13 @@
+@if (isPublicRoute()) {
+    <app-public-layout>
+        <router-outlet></router-outlet>
+    </app-public-layout>
+} @else if (authService.isAuthenticated()) {
+    <app-layout>
+        <router-outlet></router-outlet>
+    </app-layout>
+} @else {
+    <router-outlet></router-outlet>
+}
+
+<app-cookie-consent></app-cookie-consent>

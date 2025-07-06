@@ -1,0 +1,147 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-secondary-900">User Management</h1>
+            <p class="text-secondary-600 mt-1">Manage member roles and permissions</p>
+        </div>
+        <button class="btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add User
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="relative">
+                <input
+                    type="text"
+                    placeholder="Search users..."
+                    [(ngModel)]="searchTerm"
+                    (ngModelChange)="filterUsers()"
+                    class="input-field pl-10"
+                />
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                    <svg class="w-4 h-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <select
+                [(ngModel)]="roleFilter"
+                (ngModelChange)="filterUsers()"
+                class="input-field">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="reporter">Reporter</option>
+                <option value="conductor">Conductor</option>
+                <option value="section-leader">Section Leader</option>
+                <option value="musician">Musician</option>
+            </select>
+
+            <select
+                [(ngModel)]="statusFilter"
+                (ngModelChange)="filterUsers()"
+                class="input-field">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-secondary-200">
+                <thead class="bg-secondary-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                        User
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                        Role
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                        Status
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                        Last Login
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                        Actions
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-secondary-200">
+                    @for (user of filteredUsers(); track user.id) {
+                        <tr class="hover:bg-secondary-50 transition-colors duration-150">
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <div>
+                                    <div class="text-sm font-medium text-secondary-900">{{ user.name }}</div>
+                                    <div class="text-sm text-secondary-500">{{ user.email }}</div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap">
+                                <select
+                                    [value]="user.role"
+                                    (change)="updateUserRole(user.id, $event)"
+                                    class="text-sm border border-secondary-300 rounded px-2 py-1">
+                                    <option value="admin">Admin</option>
+                                    <option value="reporter">Reporter</option>
+                                    <option value="conductor">Conductor</option>
+                                    <option value="section-leader">Section Leader</option>
+                                    <option value="musician">Musician</option>
+                                </select>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full"
+                          [ngClass]="getStatusClasses(user.status)">
+                      {{ user.status | titlecase }}
+                    </span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm text-secondary-900">
+                                {{ formatDate(user.lastLogin) }}
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-sm">
+                                <div class="flex space-x-2">
+                                    <button
+                                        (click)="resetPassword(user.id)"
+                                        class="text-primary-600 hover:text-primary-900 font-medium">
+                                        Reset Password
+                                    </button>
+                                    <button
+                                        (click)="toggleUserStatus(user.id)"
+                                        [class]="user.status === 'active' ? 'text-red-600 hover:text-red-900' : 'text-accent-600 hover:text-accent-900'"
+                                        class="font-medium">
+                                        {{ user.status === 'active' ? 'Deactivate' : 'Activate' }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td colspan="5" class="px-4 py-12 text-center">
+                                <div class="text-secondary-500">
+                                    <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                    </svg>
+                                    <h3 class="text-lg font-medium text-secondary-900 mb-2">No users found</h3>
+                                    <p class="text-secondary-600">Try adjusting your search criteria.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

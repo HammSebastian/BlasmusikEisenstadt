@@ -1,0 +1,187 @@
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-secondary-900">Site Messages</h1>
+            <p class="text-secondary-600 mt-1">Manage site-wide announcements and notifications</p>
+        </div>
+        <button
+            (click)="showCreateForm.set(true)"
+            class="btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Create Message
+        </button>
+    </div>
+
+    <!-- Create/Edit Form -->
+    @if (showCreateForm()) {
+        <div class="card">
+            <h2 class="text-lg font-semibold mb-4">Create New Site Message</h2>
+            <form (ngSubmit)="createMessage()" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-secondary-700 mb-1">
+                            Title
+                        </label>
+                        <input
+                            type="text"
+                            id="title"
+                            [(ngModel)]="newMessage.title"
+                            name="title"
+                            required
+                            class="input-field"
+                            placeholder="Enter message title"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="type" class="block text-sm font-medium text-secondary-700 mb-1">
+                            Type
+                        </label>
+                        <select
+                            id="type"
+                            [(ngModel)]="newMessage.type"
+                            name="type"
+                            required
+                            class="input-field">
+                            <option value="info">Information</option>
+                            <option value="warning">Warning</option>
+                            <option value="maintenance">Maintenance</option>
+                            <option value="announcement">Announcement</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="message" class="block text-sm font-medium text-secondary-700 mb-1">
+                        Message
+                    </label>
+                    <textarea
+                        id="message"
+                        [(ngModel)]="newMessage.message"
+                        name="message"
+                        required
+                        rows="3"
+                        class="input-field"
+                        placeholder="Enter your message..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="startDate" class="block text-sm font-medium text-secondary-700 mb-1">
+                            Start Date
+                        </label>
+                        <input
+                            type="datetime-local"
+                            id="startDate"
+                            [(ngModel)]="newMessage.startDate"
+                            name="startDate"
+                            required
+                            class="input-field"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="endDate" class="block text-sm font-medium text-secondary-700 mb-1">
+                            End Date (Optional)
+                        </label>
+                        <input
+                            type="datetime-local"
+                            id="endDate"
+                            [(ngModel)]="newMessage.endDate"
+                            name="endDate"
+                            class="input-field"
+                        />
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <input
+                        type="checkbox"
+                        id="isActive"
+                        [(ngModel)]="newMessage.isActive"
+                        name="isActive"
+                        class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-secondary-300 rounded"
+                    />
+                    <label for="isActive" class="ml-2 block text-sm text-secondary-700">
+                        Activate immediately
+                    </label>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button type="submit" class="btn-primary">
+                        Create Message
+                    </button>
+                    <button
+                        type="button"
+                        (click)="cancelCreate()"
+                        class="btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    }
+
+    <!-- Messages List -->
+    <div class="space-y-4">
+        @for (message of messages(); track message.id) {
+            <div class="card border-l-4" [ngClass]="getMessageBorderClass(message.type)">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h3 class="text-lg font-semibold text-secondary-900">{{message.title}}</h3>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                  [ngClass]="getMessageTypeClasses(message.type)">
+                    {{message.type | titlecase}}
+                  </span>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full"
+                                  [ngClass]="message.isActive ? 'bg-accent-100 text-accent-800' : 'bg-secondary-100 text-secondary-800'">
+                    {{message.isActive ? 'Active' : 'Inactive'}}
+                  </span>
+                        </div>
+
+                        <p class="text-secondary-700 mb-3">{{message.message}}</p>
+
+                        <div class="text-sm text-secondary-500 space-y-1">
+                            <div>Start: {{formatDate(message.startDate)}}</div>
+                            @if (message.endDate) {
+                                <div>End: {{formatDate(message.endDate)}}</div>
+                            }
+                            <div>Created by {{message.createdBy}} on {{formatDate(message.createdAt)}}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-2 ml-4">
+                        <button
+                            (click)="toggleMessage(message.id)"
+                            [class]="message.isActive ? 'text-red-600 hover:text-red-800' : 'text-accent-600 hover:text-accent-800'"
+                            class="text-sm font-medium">
+                            {{message.isActive ? 'Deactivate' : 'Activate'}}
+                        </button>
+                        <button
+                            (click)="editMessage(message.id)"
+                            class="text-sm font-medium text-primary-600 hover:text-primary-800">
+                            Edit
+                        </button>
+                        <button
+                            (click)="deleteMessage(message.id)"
+                            class="text-sm font-medium text-red-600 hover:text-red-800">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        } @empty {
+            <div class="card text-center py-12">
+                <svg class="w-12 h-12 mx-auto text-secondary-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-secondary-900 mb-2">No messages created</h3>
+                <p class="text-secondary-600">Create your first site-wide message to get started.</p>
+            </div>
+        }
+    </div>
+</div>

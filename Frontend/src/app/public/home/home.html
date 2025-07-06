@@ -1,0 +1,143 @@
+<!-- Hero Section -->
+<section class="relative text-white h-screen">
+
+    <!-- Bild als Fullscreen Hintergrund -->
+    <div class="absolute inset-0 bg-cover bg-center z-0"
+         [ngStyle]="{'background-image': heroItems.length > 0 ? 'url(' + heroItems[0].imageUrl + ')' : ''}"></div>
+
+    <!-- Dunkles Overlay oben drauf -->
+    <div class="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+
+    <!-- Inhalt -->
+    <div class="relative z-20 h-full flex items-center justify-center px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="text-6xl mb-6">🎺</div>
+
+            @for (item of heroItems; track item.id) {
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-primary-100">
+                    {{ item.title }}
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-primary-100">
+                    {{ item.description }}
+                </p>
+            }
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a routerLink="/gigs" class="btn-primary bg-blue text-primary-50 hover:bg-primary-50">
+                    Auftritte
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AnnouncementsModel Section -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8">K&uuml;rzliche Ank&uuml;ndigungen</h2>
+            <div class="space-y-6">
+                @if (announcements.length === 0) {
+                    <p class="text-lg text-secondary-600 text-center">
+                        Keine aktiven Ank&uuml;ndigungen
+                    </p>
+                } @else {
+                    @for (announcement of announcements; track announcement.id) {
+                        <div class="card border-l-4 border-primary-500">
+                            <div class="flex heroItems-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-secondary-900 mb-2">
+                                        {{ announcement.title }}
+                                    </h3>
+                                    <p class="text-secondary-600 mb-2">
+                                        {{ announcement.message }}
+                                    </p>
+                                    <span class="text-sm text-secondary-500">
+                                    {{ announcement.startDate | date: 'yyyy-MM-dd' }}
+                                </span>
+                                    @if (announcement.endDate !== null) {
+                                        <span class="text-sm text-secondary-500 ml-2">
+                                        - {{ announcement.endDate | date: 'yyyy-MM-dd' }}
+                                    </span>
+                                    }
+                                </div>
+                                <span class="text-xs text-secondary-500 whitespace-nowrap ml-4">
+                                {{ announcement.createdBy }}
+                            </span>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="py-12 bg-secondary-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8">Kommende Veranstaltungen</h2>
+
+            @if (gigs.length === 0) {
+                <p class="text-lg text-secondary-600 text-center">
+                    Keine kommenden Veranstaltungen
+                </p>
+            } @else {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @for (gig of gigs; track gig.id) {
+                        <div class="card">
+                            <div class="text-center mb-4">
+                                <div class="text-2xl font-bold text-primary-600">
+                                    {{ gig.date | date: 'MM' }}
+                                </div>
+                                <div class="text-3xl font-bold text-primary-700">
+                                    {{ gig.date | date: 'dd' }}
+                                </div>
+                            </div>
+                            <h3 class="font-semibold text-secondary-900 mb-2">{{ gig.title }}</h3>
+                            <p class="text-sm text-secondary-600 mb-2">{{ gig.venue }}</p>
+                            <p class="text-sm text-secondary-500">
+                                {{ gig.time }}
+                            </p>
+                            <div class="mt-4">
+                                <a routerLink="/gigs/{{ gig.id }}" class="btn-primary">Details</a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-6">&Uuml;ber uns</h2>
+            <p class="text-lg text-secondary-600 mb-8">
+                TODO: Beschreibung gekürzt vom Backend laden ca. 200 Zeichen
+            </p>
+            <a routerLink="/about" class="btn-primary bg-blue text-primary-50 hover:bg-primary-50">
+                Mehr erfahren
+            </a>
+            <br>
+            <br>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary-600 mb-2"> {{ calculateYearsOfMusic() }}</div>
+                    <div class="text-secondary-600">Jahre Musik</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-accent-600 mb-2"> {{ members.length }}</div>
+                    <div class="text-secondary-600">Aktive Mitglieder</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-600 mb-2"> {{ gigs.length }}</div>
+                    <div class="text-secondary-600">J&uuml;ngere Veranstaltungen</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,43 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8" />
-    <title>Blasmusik - Brass Band Management</title>
+    <title>Stadt- & Feuerwehrkapelle Eisenstadt | Blasmusik seit 1874</title>
     <base href="/" />
+
+    <!-- SEO Basics -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Professional brass band management system for performances, members, and events." />
-    <meta name="keywords" content="brass band, music, performances, management, events" />
-    <meta name="robots" content="index, follow" />
+    <meta name="description" content="Offizielle Website der Stadt- & Feuerwehrkapelle Eisenstadt." />
+    <meta name="keywords" content="blasmusik, eisenstadt, musikverein, feuerwehrkapelle, stadtkapelle, konzerte, burgenland, musik, termine" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+    <!-- Canonical Link -->
+    <link rel="canonical" href="https://www.stadtkapelle-eisenstadt.at/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Blasmusik - Brass Band Management" />
-    <meta property="og:description" content="Professional brass band management system for performances, members, and events." />
-    <meta property="og:image" content="/assets/images/og-image.jpg" />
+    <meta property="og:title" content="Stadt- & Feuerwehrkapelle Eisenstadt" />
+    <meta property="og:description" content="Traditionelle Blasmusik aus Eisenstadt. Konzerte, Auftritte & Musik seit 1874." />
+    <meta property="og:image" content="https://www.stadtkapelle-eisenstadt.at/assets/images/og-image.png" />
+    <meta property="og:url" content="https://www.stadtkapelle-eisenstadt.at/" />
+    <meta property="og:site_name" content="Stadt- & Feuerwehrkapelle Eisenstadt" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Blasmusik - Brass Band Management" />
-    <meta name="twitter:description" content="Professional brass band management system for performances, members, and events." />
+    <meta name="twitter:title" content="Stadt- & Feuerwehrkapelle Eisenstadt" />
+    <meta name="twitter:description" content="Traditionelle Blasmusik aus Eisenstadt. Konzerte, Auftritte & Musik seit 1874." />
+    <meta name="twitter:image" content="https://www.stadtkapelle-eisenstadt.at/assets/images/og-image.png" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎺</text></svg>" />
+    <!-- Favicon (SVG-Emoji als schnelle Lösung) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎺</text></svg>" />
 
-    <!-- Fonts -->
+    <!-- Preloading wichtige Ressourcen -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Theme Color -->
+    <!-- Theme Color (für Browser & Mobile) -->
     <meta name="theme-color" content="#3B82F6" />
+
+    <!-- Structured Data (Google Rich Snippets) -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "MusicGroup",
+            "name": "Stadt- & Feuerwehrkapelle Eisenstadt",
+            "url": "https://www.stadtkapelle-eisenstadt.at/",
+            "logo": "https://www.stadtkapelle-eisenstadt.at/assets/images/og-image.jpg",
+            "foundingDate": "1874",
+            "location": {
+                "@type": "Place",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Eisenstadt",
+                    "addressCountry": "AT"
+                }
+            },
+            "sameAs": [
+                "https://www.facebook.com/stadtkapelle.eisenstadt",
+                "https://www.instagram.com/stadtkapelle.eisenstadt"
+            ]
+        }
+    </script>
 </head>
 <body>
 <app-root>
-    <!-- Loading indicator -->
+    <!-- Ladeanzeige bis Angular gerendert hat -->
     <div class="min-h-screen bg-gray-50 flex items-center justify-center">
         <div class="text-center">
             <div class="text-4xl mb-4">🎺</div>
-            <div class="text-gray-600">Loading Blasmusik...</div>
+            <div class="text-gray-600">Die Blasmusik wird geladen...</div>
             <div class="mt-4">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             </div>

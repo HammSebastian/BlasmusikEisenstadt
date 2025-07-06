@@ -1,0 +1,20 @@
+<div class="min-h-screen bg-secondary-50 flex items-center justify-center px-4">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+            <h1 class="text-9xl font-bold text-primary-600">404</h1>
+            <h2 class="text-2xl font-semibold text-secondary-900 mb-4">Seite nicht gefunden</h2>
+            <p class="text-secondary-600 mb-8">
+                Die von Ihnen angeforderte Seite konnte nicht gefunden werden.
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <a routerLink="/" class="btn-primary block">
+                Startseite
+            </a>
+            <button (click)="goBack()" class="btn-secondary block">
+                Zur&uuml;ck
+            </button>
+        </div>
+    </div>
+</div>

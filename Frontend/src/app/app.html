@@ -1,7 +1,11 @@
-<app-layout *ngIf="authService.isAuthenticated(); else authTemplate">
-    <router-outlet></router-outlet>
-</app-layout>
+@if (authService.isAuthenticated()) {
+    <app-member-layout>
+        <router-outlet></router-outlet>
+    </app-member-layout>
+} @else {
+    <app-layout>
+        <router-outlet></router-outlet>
+    </app-layout>
+}
 
-<ng-template #authTemplate>
-    <router-outlet></router-outlet>
-</ng-template>
+<app-cookie-consent></app-cookie-consent>

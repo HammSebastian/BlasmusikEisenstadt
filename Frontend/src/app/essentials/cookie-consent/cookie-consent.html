@@ -1,0 +1,33 @@
+<!-- Cookie-Consent-Banner, nur sichtbar, wenn showConsent-Signal true ist -->
+@if (showConsent()) {
+    <div class="cookie-consent">
+        <div class="container mx-auto">
+            <div class="cookie-content">
+                <div class="flex-1">
+                    <p class="cookie-text">
+                        Wir nutzen Cookies, um Ihre Erfahrung auf unserer Website zu verbessern und zur Analyse unseres
+                        Netzwerkverkehrs.
+                        Beim Klicken auf "Alle akzeptieren", akzeptieren Sie unsere
+                        <a routerLink="/privacy" class="cookie-link">
+                            Datenschutzerkl&auml;rung
+                        </a>
+                    </p>
+                </div>
+                <div class="cookie-buttons">
+                    <!-- Button zum Akzeptieren nur essenzieller Cookies -->
+                    <button
+                        (click)="acceptEssential()"
+                        class="btn-essential">
+                        Essentielle Cookies akzeptieren
+                    </button>
+                    <!-- Button zum Akzeptieren aller Cookies -->
+                    <button
+                        (click)="acceptAll()"
+                        class="btn-accept">
+                        Alle akzeptieren
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
