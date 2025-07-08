@@ -1,7 +1,7 @@
 export enum RoleEnum {
-    Admin = 'admin',
-    Reporter = 'reporter',
-    Conductor = 'conductor',
-    SectionLeader = 'section-leader',
-    Musician = 'musician',
+    ADMIN = 'ROLE_ADMIN',
+    USER = 'ROLE_USER',
+    MODERATOR = 'ROLE_MODERATOR',
+    REPORTER = 'ROLE_REPORTER',
+    CONDUCTOR = 'ROLE_CONDUCTOR',
 }

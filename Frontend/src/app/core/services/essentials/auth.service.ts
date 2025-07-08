@@ -1,13 +1,15 @@
-import {Injectable, inject, signal, computed} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Router} from '@angular/router';
-import {Observable, throwError} from 'rxjs'; // BehaviorSubject entfernt
-import {catchError, tap} from 'rxjs/operators';
-import {UserModel} from '../../models/essentials/user.model';
-import {AuthResponse} from '../../models/essentials/authResponse.model';
-import {LoginCredentials} from '../../models/essentials/loginCredentials.model';
-import {environment} from '../../../../environment/environment';
-
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { UserModel } from '../../models/essentials/user.model';
+import { AuthResponse } from '../../models/essentials/authResponse.model';
+import { LoginCredentials } from '../../models/essentials/loginCredentials.model';
+import { environment } from '../../../../environment/environment';
+import { RoleEnum } from '../../models/essentials/role.enum';
+import {ApiResponse} from '../../models/essentials/apiResponse.model';
+import {ProfileResponse} from '../../models/private/profile.response';
 
 @Injectable({
     providedIn: 'root'
@@ -22,54 +24,52 @@ export class AuthService {
 
     private readonly baseUrl = environment.apiUrl;
 
-    // Signals for reactive state management
-    // Initialisierung des Zustands direkt aus dem Storage
     private readonly authState = signal<{
         user: UserModel | null;
         isAuthenticated: boolean;
         isLoading: boolean;
     }>({
         user: this.getUserFromStorage(),
-        isAuthenticated: !!this.getToken(), // Prüft, ob ein Token vorhanden ist
+        isAuthenticated: !!this.getToken(),
         isLoading: false
     });
 
-    // Computed signals (öffentlich für den Zugriff von außen)
     public isAuthenticated = computed(() => this.authState().isAuthenticated);
     public currentUser = computed(() => this.authState().user);
     public isAdmin = computed(() => {
-        const user = this.authState().user;
-        return user?.role === 'admin' || user?.role === 'reporter';
-    });
-    public canManageGigs = computed(() => {
-        const user = this.authState().user;
-        return user?.role === 'admin' || user?.role === 'reporter' || user?.role === 'conductor';
+        const roles = this.authState().user?.roles || [];
+        return roles.includes(RoleEnum.ADMIN) || roles.includes(RoleEnum.REPORTER);
     });
 
-    // Der Konstruktor kann leer bleiben, da die Initialisierung bei der Deklaration erfolgt
-    constructor() {
-    }
+    public canManageGigs = computed(() => {
+        const roles = this.authState().user?.roles || [];
+        return roles.includes(RoleEnum.ADMIN) || roles.includes(RoleEnum.REPORTER) || roles.includes(RoleEnum.CONDUCTOR);
+    });
+
+    constructor() {}
 
     login(credentials: LoginCredentials): Observable<AuthResponse> {
-        this.setLoading(true); // Setzt isLoading auf true
+        this.setLoading(true);
 
         return this.http.post<AuthResponse>(this.baseUrl + '/auth/login', credentials).pipe(
             tap(response => {
-                this.setAuthData(response); // Speichert Daten im Storage
-                this.updateAuthState(response.user, true); // Aktualisiert den Signal-Zustand
+                this.setAuthData(response);
+                this.updateAuthState(response.user, true);
                 this.router.navigate(['/member/dashboard']);
             }),
             catchError(error => {
-                this.setLoading(false); // Setzt isLoading auf false bei Fehler
+                this.setLoading(false);
                 return throwError(() => error);
             })
         );
     }
 
     logout(): void {
-        this.clearAuthData(); // Löscht Daten aus dem Storage
-        this.updateAuthState(null, false); // Setzt den Signal-Zustand zurück
-        this.router.navigate(['/']);
+        this.http.post(this.baseUrl + '/auth/logout', {}).subscribe(() => {
+            this.clearAuthData();
+            this.updateAuthState(null, false);
+            this.router.navigate(['/']);
+        });
     }
 
     getToken(): string | null {
@@ -80,7 +80,15 @@ export class AuthService {
     private getUserFromStorage(): UserModel | null {
         if (typeof localStorage === 'undefined') return null;
         const userStr = localStorage.getItem(this.USER_KEY);
-        return userStr ? JSON.parse(userStr) : null;
+        if (!userStr) return null;
+
+        try {
+            return JSON.parse(userStr);
+        } catch {
+            // Falls kein gültiges JSON, lösche falschen Wert, gib null zurück
+            localStorage.removeItem(this.USER_KEY);
+            return null;
+        }
     }
 
     private setAuthData(response: AuthResponse): void {
@@ -88,7 +96,6 @@ export class AuthService {
         localStorage.setItem(this.TOKEN_KEY, response.token);
         localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
         localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
-        // currentUserSubject.next(response.user); // Diese Zeile wurde entfernt
     }
 
     private clearAuthData(): void {
@@ -96,7 +103,6 @@ export class AuthService {
         localStorage.removeItem(this.TOKEN_KEY);
         localStorage.removeItem(this.REFRESH_TOKEN_KEY);
         localStorage.removeItem(this.USER_KEY);
-        // currentUserSubject.next(null); // Diese Zeile wurde entfernt
     }
 
     private updateAuthState(user: UserModel | null, isAuthenticated: boolean): void {
@@ -104,7 +110,7 @@ export class AuthService {
             ...state,
             user,
             isAuthenticated,
-            isLoading: false // isLoading wird hier zurückgesetzt
+            isLoading: false
         }));
     }
 
@@ -114,4 +120,38 @@ export class AuthService {
             isLoading
         }));
     }
+
+    fetchUserProfile(): Observable<ProfileResponse> {
+        this.setLoading(true);
+
+        return this.http.get<ProfileResponse>(this.baseUrl + '/profile').pipe(
+            tap(response => {
+
+                const rolesFromBackend: string[] = response.roles; // z.B. ["ROLE_ADMIN", "ROLE_USER"]
+
+                const rolesMapped: RoleEnum[] = rolesFromBackend.map(roleStr => {
+                    switch(roleStr) {
+                        case 'ROLE_ADMIN': return RoleEnum.ADMIN;
+                        case 'ROLE_REPORTER': return RoleEnum.REPORTER;
+                        case 'ROLE_CONDUCTOR': return RoleEnum.CONDUCTOR;
+                        default: throw new Error(`Unknown role: ${roleStr}`);
+                    }
+                });
+                const user: UserModel = {
+                    id: response.id,
+                    name: response.username,  // oder wie es heißt
+                    email: response.email,
+                    roles: rolesMapped,    // falls roles vorhanden
+                };
+                this.updateAuthState(user, true);
+                this.setLoading(false);
+            }),
+            catchError(error => {
+                this.setLoading(false);
+                return throwError(() => error);
+            })
+        );
+    }
+
+
 }

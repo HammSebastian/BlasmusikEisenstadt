@@ -1,11 +1,8 @@
-import {RoleEnum} from './role.enum';
+import { RoleEnum } from './role.enum';
 
 export interface UserModel {
     id: string;
     name: string;
-    role: RoleEnum;
+    roles: RoleEnum[];  // Ändere role zu roles als Array
     email: string;
-    status: 'active' | 'inactive';
-    lastLogin: string;
-    joinDate: string;
 }

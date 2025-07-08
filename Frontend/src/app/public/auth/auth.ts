@@ -29,8 +29,8 @@ export class Auth implements OnInit {
 
     constructor() {
         this.loginForm = this.fb.group({
-            email: ['demo@blasmusik.com', [Validators.required, Validators.email]],
-            password: ['demo123', [Validators.required]],
+            username: ['', [Validators.required]],
+            password: ['', [Validators.required]],
             remember: [false]
         });
     }
@@ -55,41 +55,26 @@ export class Auth implements OnInit {
         if (this.loginForm.valid) {
             this.isLoading.set(true);
 
-            const {email, password} = this.loginForm.value;
+            const loginPayload = {
+                username: this.loginForm.value.username,
+                password: this.loginForm.value.password
+            };
 
-            // Mock login - in real app this would call the auth service
-            setTimeout(() => {
-                // Simulate successful login
-                const mockUser: UserModel = {
-                    id: '1',
-                    email,
-                    name: 'Demo User',
-                    role: RoleEnum.Admin,
-                    status: 'active',
-                    lastLogin: 'Yesterday',
-                    joinDate: 'Yesterday'
-                };
 
-                const mockResponse = {
-                    user: mockUser,
-                    token: 'mock-jwt-token',
-                    refreshToken: 'mock-refresh-token'
-                };
+            this.authService.login(loginPayload).subscribe({
+                next: (response) => {
+                    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/member/dashboard';
+                    this.router.navigate([returnUrl]);
 
-                // Store auth data manually for demo
-                localStorage.setItem('blasmusik_token', mockResponse.token);
-                localStorage.setItem('blasmusik_refresh_token', mockResponse.refreshToken);
-                localStorage.setItem('blasmusik_user', JSON.stringify(mockResponse.user));
-
-                // Update auth service state
-                (this.authService as any)['updateAuthState'](mockResponse.user, true);
-
-                // Get return URL or default to dashboard
-                const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/member-dashboard';
-                this.router.navigate([returnUrl]);
-
-                this.isLoading.set(false);
-            }, 1500);
+                    this.isLoading.set(false);
+                },
+                error: (error) => {
+                    console.error('Login failed:', error);
+                    // Hier kannst du eine Fehleranzeige ergänzen
+                    this.isLoading.set(false);
+                }
+            });
         }
     }
+
 }

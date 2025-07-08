@@ -1,20 +1,20 @@
-# Maven wrapper jar
-.mvn/wrapper/maven-wrapper.jar
-
-# Ignore target folders globally
+HELP.md
 target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-### STS (Spring Tool Suite) ###
-.apt_generated/
+### STS ###
+.apt_generated
 .classpath
 .factorypath
 .project
-.settings/
+.settings
 .springBeans
-.sts4-cache/
+.sts4-cache
 
 ### IntelliJ IDEA ###
-.idea/
+.idea
 *.iws
 *.iml
 *.ipr
@@ -26,9 +26,10 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
-
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
+
 .env
-.gitignore

@@ -17,19 +17,17 @@
                             Email Address
                         </label>
                         <input
-                            type="email"
-                            id="email"
-                            formControlName="email"
+                            type="text"
+                            id="username"
+                            formControlName="username"
                             class="input-field"
-                            [class.border-red-500]="isFieldInvalid('email')"
-                            placeholder="Enter your email"
+                            [class.border-red-500]="isFieldInvalid('username')"
+                            placeholder="Enter your username"
                         />
-                        @if (isFieldInvalid('email')) {
+                        @if (isFieldInvalid('username')) {
                             <p class="mt-1 text-sm text-red-600">
-                                @if (loginForm.get('email')?.errors?.['required']) {
-                                    Email is required
-                                } @else if (loginForm.get('email')?.errors?.['email']) {
-                                    Please enter a valid email address
+                                @if (loginForm.get('username')?.errors?.['required']) {
+                                    username is required
                                 }
                             </p>
                         }

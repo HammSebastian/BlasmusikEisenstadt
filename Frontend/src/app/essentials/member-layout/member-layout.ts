@@ -24,7 +24,11 @@ export class MemberLayout implements OnInit { // OnDestroy ist dank takeUntilDes
 
     // Abgeleitete Signale für Benutzerdaten (computed())
     protected userName = computed(() => this.authService.currentUser()?.name || 'Guest');
-    protected userRole = computed(() => this.authService.currentUser()?.role || 'user');
+    protected userRole = computed(() => {
+        const roles = this.authService.currentUser()?.roles;
+        return roles ? roles.join(', ') : 'user';
+    });
+
     protected isAdmin = computed(() => this.authService.isAdmin()); // Annahme: isAdmin() gibt ein boolean zurück
 
     protected userInitials = computed(() => {
@@ -49,6 +53,8 @@ export class MemberLayout implements OnInit { // OnDestroy ist dank takeUntilDes
                     this.screenSize.set(window.innerWidth >= 1024 ? 'lg' : 'sm');
                 });
         }
+
+        setTimeout(this.fetchUserProfile.bind(this), 1000);
     }
 
     protected closeMobileSidebar(): void {
@@ -59,5 +65,16 @@ export class MemberLayout implements OnInit { // OnDestroy ist dank takeUntilDes
 
     protected logout(): void {
         this.authService.logout();
+    }
+
+    fetchUserProfile(): void {
+        this.authService.fetchUserProfile().subscribe({
+            next: () => {
+                this.closeMobileSidebar();
+            },
+            error: () => {
+                //this.authService.logout();
+            }
+        });
     }
 }

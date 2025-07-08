@@ -1,32 +1,47 @@
 package at.sebastianhamm.backend.controller;
 
-import at.sebastianhamm.backend.io.ProfileResponse;
-import at.sebastianhamm.backend.service.EmailService;
-import at.sebastianhamm.backend.service.ProfileService;
+import at.sebastianhamm.backend.payload.response.ProfileResponse;
+import at.sebastianhamm.backend.repository.UserRepository;
+import at.sebastianhamm.backend.services.impl.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/profile")
+@Tag(name = "Profile", description = "The profile endpoint")
 @RequiredArgsConstructor
 public class ProfileController {
 
-    private final ProfileService profileService;
-    private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ProfileResponse getProfile(@CurrentSecurityContext(expression = "authentication?.name") String email) {
-        if (email == null) {
-            throw new IllegalArgumentException("User not authenticated");
-        }
-        return profileService.getProfile(email);
+    public ResponseEntity<?> getProfile(Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        Set<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        ProfileResponse response = new ProfileResponse(
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+        );
+
+        return ResponseEntity.ok(response);
     }
-
-    // Optional: Methode zum Update des Profils (PUT/PATCH) hier ergänzen
-
-    // Beispiel Async-Mail-Versand im Service:
-    // emailService.sendWelcomeEmailAsync(email, name);
 }

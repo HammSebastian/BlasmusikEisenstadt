@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {DatePipe, NgStyle} from '@angular/common';
+import {DatePipe, NgClass, NgStyle} from '@angular/common';
 import {RouterLink} from '@angular/router';
 import {SeoService} from '../../core/services/essentials/seo.service';
 import {AuthService} from '../../core/services/essentials/auth.service';
@@ -12,13 +12,18 @@ import {AboutModel} from '../../core/models/public/about.model';
 
 @Component({
     selector: 'app-home',
-    imports: [RouterLink, NgStyle, DatePipe],
+    imports: [RouterLink, NgStyle, DatePipe, NgClass],
     templateUrl: './home.html',
     styleUrl: './home.css'
 })
 export class Home implements OnInit {
 
-    heroItems: HeroItemModel[] = [];
+    heroItems: HeroItemModel = {
+        id: 1,
+        title: 'Stadt- & Feuerwehrkapelle Eisenstadt',
+        description: 'Willkommen auf unserer Webseite!',
+        imageUrl: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=150'
+    }
     announcements: AnnouncementsModel[] = [];
     gigs: GigModel[] = [];
     members: MemberModel[] = [];
@@ -51,24 +56,21 @@ export class Home implements OnInit {
 
     private loadItems(): void {
         this.dataService.loadHeroItems().subscribe(items => {
-            this.heroItems = items.result;
+            this.heroItems = items;
         });
-
-        if (this.heroItems.length === 0) {
-            this.heroItems = [
-                {
-                    id: 1,
-                    title: 'Stadt- & Feuerwehrkapelle Eisenstadt',
-                    description: 'Willkommen auf unserer Webseite!',
-                    imageUrl: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia04.meinbezirk.at%2Farticle%2F2023%2F12%2F05%2F2%2F37540742_XXL.jpg&f=1&nofb=1&ipt=b434e520a58800bcc08174262b99eaa72fde7aca595840b52a47e3317b16af99'
-                }
-            ];
-        }
     }
 
     private loadAnnouncements() {
-        this.dataService.loadAnnouncements().subscribe(announcements => {
-            this.announcements = announcements.result;
+        this.dataService.loadAnnouncements().subscribe(rawAnnouncements => {
+            this.announcements = rawAnnouncements.map(a => ({
+                id: a.id,
+                title: a.title,
+                message: a.message,
+                types: a.types,
+                startDate: a.startDate,
+                endDate: a.endDate,
+                createdBy: a.createdBy
+            }));
         });
     }
 

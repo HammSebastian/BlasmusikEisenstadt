@@ -14,7 +14,7 @@ export class About implements OnInit {
     private readonly dataService = inject(DataService);
     about: AboutModel = {
         id: 1,
-        imageUrl: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=150',
+        imageUrl: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia04.meinbezirk.at%2Farticle%2F2023%2F12%2F05%2F2%2F37540742_XXL.jpg&f=1&nofb=1&ipt=b434e520a58800bcc08174262b99eaa72fde7aca595840b52a47e3317b16af99',
         story: `Die Stadt- & Feuerwehrkapelle Eisenstadt blickt auf eine mehr als 40-jährige Geschichte zurück. Im Jahr 1985 wurde der Grundstein gelegt, als eine Gruppe leidenschaftlicher Musiker zusammenkam, um ihre gemeinsame Liebe zur Blasmusik in die Gemeinschaft zu tragen. Aus einem kleinen Ensemble ist über die Jahre eine der angesehensten Blaskapellen der Region gewachsen.
 
 Unsere Reise ist geprägt von unzähligen Auftritten bei verschiedensten Anlässen – von intimen Gemeindeveranstaltungen bis hin zu großen Festen und Wettbewerben. Unser Repertoire ist breit gefächert und reicht von traditionellen Blasmusikklassikern über zeitgenössische Arrangements bis hin zu Eigenkompositionen, die die Vielseitigkeit und Ausdruckskraft unserer Blasinstrumente eindrucksvoll unter Beweis stellen.

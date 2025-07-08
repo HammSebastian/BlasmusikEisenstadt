@@ -19,13 +19,14 @@ export class DataService {
     http: HttpClient = inject(HttpClient);
 
 
-    loadHeroItems(): Observable<ApiResponse<HeroItemModel[]>> {
-        return this.http.get<ApiResponse<HeroItemModel[]>>(this.baseUrl + '/public/hero-items');
+    loadHeroItems(): Observable<HeroItemModel> {
+        return this.http.get<HeroItemModel>(this.baseUrl + '/public/hero-items');
     }
 
-    loadAnnouncements(): Observable<ApiResponse<AnnouncementsModel[]>> {
-        return this.http.get<ApiResponse<AnnouncementsModel[]>>(this.baseUrl + '/public/announcements');
+    loadAnnouncements(): Observable<AnnouncementsModel[]> {
+        return this.http.get<AnnouncementsModel[]>(this.baseUrl + '/public/announcements');
     }
+
 
     loadGigs(): Observable<ApiResponse<GigModel[]>> {
         return this.http.get<ApiResponse<GigModel[]>>(this.baseUrl + '/public/gigs');

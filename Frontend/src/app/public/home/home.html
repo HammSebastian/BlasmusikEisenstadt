@@ -1,6 +1,6 @@
 <section class="relative text-white h-screen">
     <div class="absolute inset-0 bg-cover bg-center z-0"
-         [ngStyle]="{'background-image': heroItems.length > 0 ? 'url(' + heroItems[0].imageUrl + ')' : ''}">
+         [ngStyle]="{'background-image': heroItems.imageUrl.length > 0 ? 'url(' + heroItems.imageUrl + ')' : ''}">
     </div>
     <div class="absolute inset-0 bg-black bg-opacity-50 z-10">
     </div>
@@ -8,14 +8,12 @@
     <div class="relative z-20 h-full flex items-center justify-center px-4">
         <div class="max-w-4xl mx-auto text-center">
 
-            @for (item of heroItems; track item.id) {
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-primary-100">
-                    {{ item.title }}
-                </h1>
-                <p class="text-xl md:text-2xl mb-8 text-primary-100">
-                    {{ item.description }}
-                </p>
-            }
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 text-primary-100">
+                {{ heroItems.title }}
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-primary-100">
+                {{ heroItems.description }}
+            </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a routerLink="/gigs" class="btn-primary bg-blue text-primary-50 hover:bg-primary-50">
@@ -25,21 +23,39 @@
         </div>
     </div>
 </section>
-
 <section class="py-12 bg-white">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8">K&uuml;rzliche Ank&uuml;ndigungen</h2>
+            <h2 class="text-3xl font-bold text-center mb-8">Kürzliche Ankündigungen</h2>
             <div class="space-y-6">
                 @if (announcements.length === 0) {
                     <p class="text-lg text-secondary-600 text-center">
-                        Keine aktiven Ank&uuml;ndigungen
+                        Keine aktiven Ankündigungen
                     </p>
                 } @else {
                     @for (announcement of announcements; track announcement.id) {
-                        <div class="card border-l-4 border-primary-500">
+                        <div
+                            class="card border-l-4"
+                            [ngClass]="{
+                                'border-blue-500 bg-blue-50': announcement.types[0] === 'INFO',
+                                'border-yellow-500 bg-yellow-50': announcement.types[0] === 'WARNING',
+                                'border-red-500 bg-red-50': announcement.types[0] === 'MAINTENANCE',
+                                'border-green-500 bg-green-50': announcement.types[0] === 'ANNOUNCEMENT'
+                              }"
+                        >
                             <div class="flex heroItems-start justify-between">
                                 <div>
+                                    <h2 class="text-lg font-semibold text-secondary-900 mb-2">
+                                        @if (announcement.types[0] === 'INFO') {
+                                            <span class="text-blue-500">INFO</span>
+                                        } @else if (announcement.types[0] === 'WARNING') {
+                                            <span class="text-yellow-500">WARNUNG</span>
+                                        } @else if (announcement.types[0] === 'MAINTENANCE') {
+                                            <span class="text-red-500">WARTUNG</span>
+                                        } @else if (announcement.types[0] === 'ANNOUNCEMENT') {
+                                            <span class="text-green-500">ANK&Uuml;NDIGUNG</span>
+                                        }
+                                    </h2>
                                     <h3 class="text-lg font-semibold text-secondary-900 mb-2">
                                         {{ announcement.title }}
                                     </h3>
@@ -47,17 +63,17 @@
                                         {{ announcement.message }}
                                     </p>
                                     <span class="text-sm text-secondary-500">
-                                    {{ announcement.startDate | date: 'yyyy-MM-dd' }}
-                                </span>
+                                        {{ announcement.startDate | date: 'yyyy-MM-dd' }}
+                                    </span>
                                     @if (announcement.endDate !== null) {
                                         <span class="text-sm text-secondary-500 ml-2">
-                                        - {{ announcement.endDate | date: 'yyyy-MM-dd' }}
-                                    </span>
+                                          - {{ announcement.endDate | date: 'yyyy-MM-dd' }}
+                                        </span>
                                     }
                                 </div>
                                 <span class="text-xs text-secondary-500 whitespace-nowrap ml-4">
-                                {{ announcement.createdBy }}
-                            </span>
+                                      {{ announcement.createdBy }}
+                                </span>
                             </div>
                         </div>
                     }
@@ -66,6 +82,7 @@
         </div>
     </div>
 </section>
+
 
 <section class="py-12 bg-secondary-50">
     <div class="container mx-auto px-4">

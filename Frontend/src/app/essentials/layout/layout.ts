@@ -6,7 +6,7 @@ import {Notification} from '../notification/notification';
 
 @Component({
     selector: 'app-layout',
-    imports: [CommonModule, RouterLink, RouterLinkActive, Notification, NgOptimizedImage],
+    imports: [CommonModule, RouterLink, RouterLinkActive, Notification],
     templateUrl: './layout.html',
     styleUrl: './layout.css'
 })
