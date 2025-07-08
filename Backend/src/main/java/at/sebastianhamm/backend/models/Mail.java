@@ -1,15 +1,26 @@
 package at.sebastianhamm.backend.models;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+/**
+ * DTO representing an email with template support.
+ */
+@Getter
+@Setter
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class Mail {
 
     private String from;
+
     private String to;
+
     private String subject;
+
     private HtmlTemplate htmlTemplate;
 }

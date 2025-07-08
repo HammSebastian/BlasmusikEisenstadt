@@ -1,16 +1,22 @@
 package at.sebastianhamm.backend.payload.request;
 
-
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@RequiredArgsConstructor
+/**
+ * DTO for login requests.
+ * Validates that username and password are provided.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 public class LoginRequest {
-    @NotBlank
+
+    @NotBlank(message = "Username must not be blank")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Password must not be blank")
     private String password;
 }

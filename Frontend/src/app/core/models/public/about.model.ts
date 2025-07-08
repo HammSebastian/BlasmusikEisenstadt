@@ -1,11 +1,8 @@
+import {MissionItem} from './mission.model';
+
 export interface AboutModel {
     id: number;
     imageUrl: string;
     story: string;
-    mission: MissionItem[];
-}
-
-export interface MissionItem {
-    title: string;
-    description: string;
+    missions: MissionItem[];  // Changed from 'mission' to 'missions' to match API
 }

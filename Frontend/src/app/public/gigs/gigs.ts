@@ -19,19 +19,26 @@ export class Gigs implements OnInit {
     gigs: GigModel[] = [];
 
     ngOnInit() {
-        this.loadGigs();
-    }
-
-    private loadGigs() {
         this.seoService.updateMetaTags({
             title: 'Auftritte & Konzerte',
             description: 'Überprüfen Sie die kommenden Auftritte und Konzerte der Stadt&Feuerwehrkapelle Eisenstadt',
             keywords: 'blasmusik, eisenstadt, musikverein, feuerwehrkapelle, stadtkapelle, konzerte, burgenland, musik, termine'
         });
 
-        this.dataService.loadGigs().subscribe(gigs => {
-            this.gigs = gigs.result;
-        })
+        this.loadGigs();
+    }
+
+    private loadGigs() {
+        this.dataService.loadGigs().subscribe({
+            next: (response) => {
+                const gigsArray = Array.isArray(response) ? response : (response?.result || []);
+                this.gigs = gigsArray.slice(0, 3);
+            },
+            error: (error) => {
+                console.error('Error loading gigs:', error);
+                this.gigs = [];
+            }
+        });
     }
 
     goBack() {

@@ -39,4 +39,12 @@ export class DataService {
     loadAbout(): Observable<ApiResponse<AboutModel>> {
         return this.http.get<ApiResponse<AboutModel>>(this.baseUrl + '/public/about');
     }
+
+    /**
+     * Lädt ein einzelnes Mitglied anhand der ID
+     * @param id Die ID des Mitglieds
+     */
+    loadMemberById(id: number | string): Observable<ApiResponse<MemberModel>> {
+        return this.http.get<ApiResponse<MemberModel>>(`${this.baseUrl}/public/members/${id}`);
+    }
 }

@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {SeoService} from '../../core/services/essentials/seo.service';
 import {MemberModel} from '../../core/models/public/member.model';
 import {DatePipe} from '@angular/common';
+import {DataService} from '../../core/services/public/data.service';
 
 export interface Remark {
     text: string;
@@ -21,75 +22,71 @@ export class MembersDetail implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly seoService = inject(SeoService);
+    private readonly dataService = inject(DataService);
 
     member = signal<MemberModel | null>(null);
     memberRemarksText = signal<string>('');
-
-    protected members: MemberModel[] = [
-        {
-            id: 1,
-            name: 'Max Mustermann',
-            instrument: 'Trompete',
-            section: 'Hohes Blech',
-            joinDate: '2020-01-15',
-            avatarUrl: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=150',
-            remarks: [
-                {
-                    text: 'Teilnahme am Frühlingskonzert und den zugehörigen Proben. Hat sich aktiv eingebracht und gute Vorschläge zur Verbesserung der Ensemble-Performance gemacht. War pünktlich und zuverlässig bei allen Terminen. Eine sehr engagierte Leistung.',
-                    timestamp: '2025-06-01',
-                    type: 'accent'
-                },
-                {
-                    text: 'Hervorragende Leistung beim Osterumzug, besonders im Solo-Part. Die Zuschauer waren begeistert von der Präzision und dem Ausdruck. Hat auch im Team gut funktioniert und andere unterstützt.',
-                    timestamp: '2025-03-28',
-                    type: 'primary'
-                },
-                {
-                    text: 'Kontaktinformationen aktualisiert: Neue Telefonnummer und E-Mail-Adresse hinterlegt. Dies ist eine längere administrative Bemerkung, die keine musikalische Aktivität beschreibt, aber dennoch wichtig für die interne Kommunikation ist. Sie sollte vollständig sichtbar sein, auch wenn sie etwas länger ist.',
-                    timestamp: '2025-02-10',
-                    type: 'yellow'
-                },
-                {
-                    text: 'Kürzere allgemeine Notiz zur Anwesenheit bei den letzten drei Übungseinheiten. Es gab keine besonderen Vorkommnisse, alles lief wie erwartet.',
-                    timestamp: '2025-01-05',
-                    type: 'accent'
-                }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Anna Schmidt',
-            instrument: 'Klarinette',
-            section: 'Holz',
-            joinDate: '2019-03-20',
-            avatarUrl: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150',
-            remarks: [
-                {text: 'Anmeldung zum Sommerfest bestätigt.', timestamp: '2025-05-10', type: 'accent'},
-                {
-                    text: 'Neues Notenmaterial für das Herbstkonzert erhalten. Hat schnell die neuen Stücke gelernt und integriert.',
-                    timestamp: '2025-04-20',
-                    type: 'yellow'
-                }
-            ]
-        }
-    ];
+    isLoading = signal<boolean>(true);
+    error = signal<string | null>(null);
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');
         if (id) {
-            const foundMember = this.members.find(member => member.id.toString() === id);
-            this.member.set(foundMember || null);
-
-            if (foundMember) {
-                this.seoService.updateMetaTags({
-                    title: `${foundMember.name} - Member Details - Blasmusik`,
-                    description: `View details for ${foundMember.name}, ${foundMember.instrument} player in the brass band.`,
-                    keywords: `member, ${foundMember.name}, ${foundMember.instrument}, brass band`
-                });
-
-                this.memberRemarksText.set(this.formatRemarksForDisplay(foundMember.remarks || []));
-            }
+            this.loadMember(id);
+        } else {
+            this.error.set('Keine Mitglieds-ID angegeben.');
+            this.isLoading.set(false);
         }
+    }
+
+    private loadMember(id: string): void {
+        this.isLoading.set(true);
+        this.error.set(null);
+
+        this.dataService.loadMemberById(id).subscribe({
+            next: (response) => {
+                const memberData = response?.result || response;
+                if (memberData) {
+                    this.member.set({
+                        ...memberData,
+                        // Stelle sicher, dass die avatarUrl gesetzt ist
+                        avatarUrl: memberData.avatarUrl || this.getDefaultAvatarUrl(memberData.name)
+                    });
+
+                    this.seoService.updateMetaTags({
+                        title: `${memberData.name} - Mitglied - Blasmusik Eisenstadt`,
+                        description: `Profil von ${memberData.name}, ${memberData.instrument}`,
+                        keywords: `mitglied, ${memberData.name}, ${memberData.instrument}, blasmusik, eisenstadt`
+                    });
+
+                    if (memberData.remarks && memberData.remarks.length > 0) {
+                        this.memberRemarksText.set(this.formatRemarksForDisplay(memberData.remarks));
+                    } else {
+                        this.memberRemarksText.set('Keine Bemerkungen vorhanden.');
+                    }
+                } else {
+                    this.error.set('Mitglied nicht gefunden.');
+                }
+                this.isLoading.set(false);
+            },
+            error: (error) => {
+                console.error('Fehler beim Laden des Mitglieds:', error);
+                this.error.set('Fehler beim Laden der Mitgliederdaten. Bitte versuchen Sie es später erneut.');
+                this.isLoading.set(false);
+            }
+        });
+    }
+
+    protected getDefaultAvatarUrl(name: string): string {
+        // Erstelle eine konsistente Farbe basierend auf dem Namen
+        const colors = [
+            'FF5733', '33FF57', '3357FF', 'F3FF33', 'FF33F3',
+            '33FFF3', 'FF8C33', '8C33FF', '33FF8C', 'FF338C'
+        ];
+        const charCode = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const color = colors[charCode % colors.length];
+
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${color}&color=fff&size=256`;
     }
 
     private formatRemarksForDisplay(remarks: Remark[]): string {
@@ -123,5 +120,14 @@ export class MembersDetail implements OnInit {
             month: 'long',
             day: 'numeric'
         });
+    }
+
+    protected onImageError(event: Event): void {
+        const imgElement = event.target as HTMLImageElement;
+        if (this.member()?.name) {
+            imgElement.src = this.getDefaultAvatarUrl(this.member()!.name);
+        } else {
+            imgElement.src = 'https://ui-avatars.com/api/?name=Member&background=random';
+        }
     }
 }

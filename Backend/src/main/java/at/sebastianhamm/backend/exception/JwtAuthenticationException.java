@@ -1,4 +1,10 @@
 package at.sebastianhamm.backend.exception;
 
-public class JwtAuthenticationException extends Throwable {
+/**
+ * Custom runtime exception for JWT authentication errors.
+ */
+public class JwtAuthenticationException extends RuntimeException {
+    public JwtAuthenticationException(String message) {
+        super(message);
+    }
 }

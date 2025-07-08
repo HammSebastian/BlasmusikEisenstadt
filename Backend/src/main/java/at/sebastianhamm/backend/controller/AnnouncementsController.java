@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.controller;
 
 import at.sebastianhamm.backend.exception.ResourceNotFoundException;
-import at.sebastianhamm.backend.models.Announcements;
+import at.sebastianhamm.backend.models.Announcement;
 import at.sebastianhamm.backend.models.EType;
 import at.sebastianhamm.backend.payload.response.AnnouncementsResponse;
 import at.sebastianhamm.backend.services.AnnouncementsService;
@@ -40,7 +40,7 @@ public class AnnouncementsController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_REPORTER')")
     @ResponseStatus(HttpStatus.CREATED)
-    public AnnouncementsResponse createAnnouncement(@Valid @RequestBody Announcements announcement) {
+    public AnnouncementsResponse createAnnouncement(@Valid @RequestBody Announcement announcement) {
         return announcementsService.createAnnouncement(announcement);
     }
 
@@ -49,7 +49,7 @@ public class AnnouncementsController {
     @ResponseStatus(HttpStatus.OK)
     public AnnouncementsResponse updateAnnouncement(
             @PathVariable Long id,
-            @Valid @RequestBody Announcements announcement) {
+            @Valid @RequestBody Announcement announcement) {
         return announcementsService.updateAnnouncement(id, announcement);
     }
 
@@ -62,7 +62,7 @@ public class AnnouncementsController {
 
     @GetMapping("/type/{type}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Announcements> getAnnouncementsByType(@PathVariable EType type) {
+    public List<Announcement> getAnnouncementsByType(@PathVariable EType type) {
         return announcementsService.findByType(type);
     }
 }

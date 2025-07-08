@@ -4,7 +4,6 @@ import at.sebastianhamm.backend.jwt.AuthEntryPointJwt;
 import at.sebastianhamm.backend.jwt.AuthTokenFilter;
 import at.sebastianhamm.backend.services.impl.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,10 +17,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration for the application.
+ * Configures authentication, authorization, and JWT filters.
+ */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
+
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
 
@@ -45,29 +49,35 @@ public class WebSecurityConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12); // Use strength 12 for better security
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+        http
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                        "/auth/**",
-                                        "/swagger-ui.html",
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/swagger-resources/**",
-                                        "/webjars/**",
-                                        "/public/hero-items",
-                                        "/public/announcements"
-                                        ).permitAll()
-                                .requestMatchers("/profile").authenticated()
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/auth/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/public/hero-items",
+                                "/public/announcements",
+                                "/public/gigs",
+                                "/public/members",
+                                "/public/members/**",
+                                "/public/about"
+                        ).permitAll()
+                        .requestMatchers("/profile").authenticated()
+                        .anyRequest().authenticated()
                 );
 
+        http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.services;
 
-import at.sebastianhamm.backend.models.Announcements;
+import at.sebastianhamm.backend.models.Announcement;
 import at.sebastianhamm.backend.models.EType;
 import at.sebastianhamm.backend.payload.response.AnnouncementsResponse;
 
@@ -10,11 +10,11 @@ import java.util.Optional;
 public interface AnnouncementsService {
 
     List<AnnouncementsResponse> getAllAnnouncements();
-    Optional<Announcements> getAnnouncementById(Long id);
-    AnnouncementsResponse createAnnouncement(Announcements announcement);
-    AnnouncementsResponse updateAnnouncement(Long id, Announcements announcement);
+    Optional<Announcement> getAnnouncementById(Long id);
+    AnnouncementsResponse createAnnouncement(Announcement announcement);
+    AnnouncementsResponse updateAnnouncement(Long id, Announcement announcement);
     void deleteAnnouncement(Long id);
-    List<Announcements> findByType(EType type);
+    List<Announcement> findByType(EType type);
     
-    AnnouncementsResponse mapToResponse(Announcements announcements);
+    AnnouncementsResponse mapToResponse(Announcement announcement);
 }

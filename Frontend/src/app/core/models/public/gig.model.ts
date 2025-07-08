@@ -8,4 +8,5 @@ export interface GigModel {
     address: string;
     imageUrl: string;
     note?: string;
+    gigType: 'brunch' | 'twilight' | 'concert' | 'performance' | 'other';
 }

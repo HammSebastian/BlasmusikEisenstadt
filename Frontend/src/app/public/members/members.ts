@@ -45,25 +45,40 @@ export class Members implements OnInit {
     }
 
     private loadMembers() {
-        /*
-        this.dataService.loadMembers().subscribe(members => {
-            this.members = members.result;
-            this.filterMembers();
-        });
-        */
-
-        // Dummy data
-        this.members = [
-            {
-                id: 1,
-                name: 'Max Mustermann',
-                instrument: 'Glocke',
-                section: 'Holz',
-                avatarUrl: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150',
-                joinDate: '2022-01-01',
+        this.dataService.loadMembers().subscribe({
+            next: (response) => {
+                // Handle both direct array response and response with result property
+                let members = Array.isArray(response) ? response : (response?.result || []);
+                
+                // Füge Standardbilder hinzu, falls keine vorhanden sind
+                this.members = members.map(member => ({
+                    ...member,
+                    avatarUrl: member.avatarUrl || this.getDefaultAvatarUrl(member.name)
+                }));
+                
+                console.log('Geladene Mitglieder:', this.members); // Debug-Ausgabe
+                this.filteredMembers.set([...this.members]);
+                this.updatePagination();
+            },
+            error: (error) => {
+                console.error('Fehler beim Laden der Mitglieder:', error);
+                this.members = [];
+                this.filteredMembers.set([]);
+                this.updatePagination();
             }
-        ];
+        });
+    }
 
+    private getDefaultAvatarUrl(name: string): string {
+        // Erstelle eine konsistente Farbe basierend auf dem Namen
+        const colors = [
+            'FF5733', '33FF57', '3357FF', 'F3FF33', 'FF33F3',
+            '33FFF3', 'FF8C33', '8C33FF', '33FF8C', 'FF338C'
+        ];
+        const charCode = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const color = colors[charCode % colors.length];
+        
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${color}&color=fff&size=256`;
     }
 
     protected filterMembers(): void {

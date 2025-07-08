@@ -99,10 +99,7 @@
                         <div class="card">
                             <div class="text-center mb-4">
                                 <div class="text-2xl font-bold text-primary-600">
-                                    {{ gig.date | date: 'MM' }}
-                                </div>
-                                <div class="text-3xl font-bold text-primary-700">
-                                    {{ gig.date | date: 'dd' }}
+                                    {{ gig.date | date: 'dd.MM.yyyy' }}
                                 </div>
                             </div>
                             <h3 class="font-semibold text-secondary-900 mb-2">{{ gig.title }}</h3>
@@ -145,7 +142,11 @@
                 </div>
                 <div class="text-center">
                     <div class="text-3xl font-bold text-yellow-600 mb-2"> {{ gigs.length }}</div>
-                    <div class="text-secondary-600">J&uuml;ngere Veranstaltungen</div>
+                    @if (gigs.length === 1) {
+                        <div class="text-secondary-600">Veranstaltung</div>
+                    } @else {
+                        <div class="text-secondary-600">Veranstaltungen</div>
+                    }
                 </div>
             </div>
         </div>

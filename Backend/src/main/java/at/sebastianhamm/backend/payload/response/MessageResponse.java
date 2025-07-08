@@ -1,12 +1,18 @@
 package at.sebastianhamm.backend.payload.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@RequiredArgsConstructor
+/**
+ * Simple DTO for API message responses.
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
+
     private String message;
 }

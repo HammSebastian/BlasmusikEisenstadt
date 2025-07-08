@@ -31,7 +31,7 @@ export class Home implements OnInit {
         id: 1,
         imageUrl: 'https://images.pexels.com/photos/1065084/pexels-photo-1065084.jpeg?auto=compress&cs=tinysrgb&w=150',
         story: '',
-        mission: [],
+        missions: [],
     };
 
     private readonly seoService = inject(SeoService);
@@ -75,20 +75,42 @@ export class Home implements OnInit {
     }
 
     private loadGigs() {
-        this.dataService.loadGigs().subscribe(gigs => {
-            this.gigs = gigs.result.slice(0, 3);
+        this.dataService.loadGigs().subscribe({
+            next: (response) => {
+                // Handle both direct array response and response with result property
+                const gigsArray = Array.isArray(response) ? response : (response?.result || []);
+                this.gigs = gigsArray.slice(0, 3);
+            },
+            error: (error) => {
+                console.error('Error loading gigs:', error);
+                this.gigs = [];
+            }
         });
     }
 
     private loadMembers() {
-        this.dataService.loadMembers().subscribe(members => {
-            this.members = members.result;
+        this.dataService.loadMembers().subscribe({
+            next: (response) => {
+                // Handle both direct array response and response with result property
+                this.members = Array.isArray(response) ? response : (response?.result || []);
+            },
+            error: (error) => {
+                console.error('Error loading members:', error);
+                this.members = [];
+            }
         });
     }
 
     private loadAbout() {
-        this.dataService.loadAbout().subscribe(about => {
-            this.about = about.result;
+        this.dataService.loadAbout().subscribe({
+            next: (response) => {
+                // Handle both direct object response and response with result property
+                this.about = response?.result || response || this.about; // Fallback to current about if response is invalid
+            },
+            error: (error) => {
+                console.error('Error loading about:', error);
+                // Keep the default about data if there's an error
+            }
         });
     }
 

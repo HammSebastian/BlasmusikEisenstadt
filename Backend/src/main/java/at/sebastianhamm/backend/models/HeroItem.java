@@ -2,25 +2,49 @@ package at.sebastianhamm.backend.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+/**
+ * Entity representing a Hero Item.
+ * Hardened with validation and production-ready annotations.
+ */
 @Entity
 @Table(name = "hero_items")
-@Data
-@RequiredArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class HeroItem {
 
+    /**
+     * Primary key identifier.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    /**
+     * Title of the hero item.
+     * Cannot be blank.
+     */
+    @Column(nullable = false)
+    @NotBlank(message = "Title must not be blank")
     private String title;
 
-    @NotBlank
+    /**
+     * Description of the hero item.
+     * Cannot be blank.
+     */
+    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotBlank(message = "Description must not be blank")
     private String description;
 
-    @NotBlank
+    /**
+     * URL of the hero item's image.
+     * Cannot be blank.
+     */
+    @Column(nullable = false)
+    @NotBlank(message = "Image URL must not be blank")
     private String imageUrl;
 }

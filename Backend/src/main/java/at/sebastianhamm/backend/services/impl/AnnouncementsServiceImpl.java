@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.services.impl;
 
 import at.sebastianhamm.backend.exception.ConflictException;
-import at.sebastianhamm.backend.models.Announcements;
+import at.sebastianhamm.backend.models.Announcement;
 import at.sebastianhamm.backend.models.EType;
 import at.sebastianhamm.backend.models.Type;
 import at.sebastianhamm.backend.payload.response.AnnouncementsResponse;
@@ -28,22 +28,22 @@ public class AnnouncementsServiceImpl implements AnnouncementsService {
     }
 
     @Override
-    public Optional<Announcements> getAnnouncementById(Long id) {
+    public Optional<Announcement> getAnnouncementById(Long id) {
         return announcementsRepository.findById(id);
     }
 
     @Override
-    public AnnouncementsResponse createAnnouncement(Announcements announcement) {
+    public AnnouncementsResponse createAnnouncement(Announcement announcement) {
         if (announcement.getId() != null && announcementsRepository.existsById(announcement.getId())) {
             throw new ConflictException("Announcement with id " + announcement.getId() + " already exists");
         }
 
-        Announcements saved = announcementsRepository.save(announcement);
+        Announcement saved = announcementsRepository.save(announcement);
         return mapToResponse(saved);
     }
 
     @Override
-    public AnnouncementsResponse updateAnnouncement(Long id, Announcements announcement) {
+    public AnnouncementsResponse updateAnnouncement(Long id, Announcement announcement) {
         return announcementsRepository.findById(id)
                 .map(existing -> {
                     existing.setTitle(announcement.getTitle());
@@ -52,7 +52,7 @@ public class AnnouncementsServiceImpl implements AnnouncementsService {
                     existing.setStartDate(announcement.getStartDate());
                     existing.setEndDate(announcement.getEndDate());
                     existing.setCreatedBy(announcement.getCreatedBy());
-                    Announcements updated = announcementsRepository.save(existing);
+                    Announcement updated = announcementsRepository.save(existing);
                     return mapToResponse(updated);
                 })
                 .orElseThrow(() -> new ConflictException("Announcement with id " + id + " does not exist"));
@@ -67,22 +67,22 @@ public class AnnouncementsServiceImpl implements AnnouncementsService {
     }
 
     @Override
-    public List<Announcements> findByType(EType type) {
+    public List<Announcement> findByType(EType type) {
         Set<Type> types = Set.of(new Type(type));
         return announcementsRepository.findByTypes(types);
     }
 
-    public AnnouncementsResponse mapToResponse(Announcements announcements) {
+    public AnnouncementsResponse mapToResponse(Announcement announcement) {
         return AnnouncementsResponse.builder()
-                .id(announcements.getId())
-                .title(announcements.getTitle())
-                .message(announcements.getMessage())
-                .types(announcements.getTypes().stream()
+                .id(announcement.getId())
+                .title(announcement.getTitle())
+                .message(announcement.getMessage())
+                .types(announcement.getTypes().stream()
                         .map(type -> type.getType().name())
                         .collect(java.util.stream.Collectors.toSet()))
-                .startDate(announcements.getStartDate())
-                .endDate(announcements.getEndDate())
-                .createdBy(announcements.getCreatedBy())
+                .startDate(announcement.getStartDate())
+                .endDate(announcement.getEndDate())
+                .createdBy(announcement.getCreatedBy())
                 .build();
     }
 }

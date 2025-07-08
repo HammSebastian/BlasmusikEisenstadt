@@ -14,7 +14,7 @@ import java.util.Set;
 @Table(name = "announcements")
 @Data
 @RequiredArgsConstructor
-public class Announcements {
+public class Announcement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Announcements {
     @NotBlank
     private String createdBy;
 
-    public Announcements(String title, String message, Set<Type> types, Date startDate, String createdBy) {
+    public Announcement(String title, String message, Set<Type> types, Date startDate, String createdBy) {
         this.title = title;
         this.message = message;
         this.types = types;
