@@ -73,6 +73,3 @@ BlasmusikEisenstadt/
 
 ## License
 This project is licensed under the [Creative Commons Zero (CC0) 1.0 Universal](LICENSE) license.
-
-## Contact
-For more information, please contact [Your Contact Information]
