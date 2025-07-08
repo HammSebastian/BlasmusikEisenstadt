@@ -72,7 +72,7 @@ BlasmusikEisenstadt/
 5. Start the development servers
 
 ## License
-![LICENSE.md]LICENSE.md
+This project is licensed under the [Creative Commons Zero (CC0) 1.0 Universal](LICENSE) license.
 
 ## Contact
 For more information, please contact [Your Contact Information]
