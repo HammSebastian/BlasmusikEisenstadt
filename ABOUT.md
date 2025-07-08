@@ -71,11 +71,8 @@ BlasmusikEisenstadt/
 4. Install frontend dependencies: `cd Frontend && npm install`
 5. Start the development servers
 
-## Contributing
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## License
-[Specify your license here, e.g., MIT, Apache 2.0, etc.]
+![LICENSE.md]LICENSE.md
 
 ## Contact
 For more information, please contact [Your Contact Information]
