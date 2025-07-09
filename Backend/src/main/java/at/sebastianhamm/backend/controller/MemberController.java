@@ -1,10 +1,9 @@
 package at.sebastianhamm.backend.controller;
 
 import at.sebastianhamm.backend.exception.ResourceNotFoundException;
-import at.sebastianhamm.backend.models.Member;
+import at.sebastianhamm.backend.models.user.Member;
 import at.sebastianhamm.backend.payload.response.MemberResponse;
 import at.sebastianhamm.backend.services.MemberService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,11 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
-@RequestMapping("/public/members")
-@Tag(name = "Members", description = "The member endpoint")
-@RequiredArgsConstructor
+@RequestMapping("/public/members") @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;

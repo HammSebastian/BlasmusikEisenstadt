@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.services.impl;
 
-import at.sebastianhamm.backend.models.User;
+import at.sebastianhamm.backend.models.user.User;
 import at.sebastianhamm.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

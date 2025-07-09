@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.services.impl;
 
-import at.sebastianhamm.backend.models.HeroItem;
+import at.sebastianhamm.backend.models.announcement.HeroItem;
 import at.sebastianhamm.backend.payload.request.HeroItemRequest;
 import at.sebastianhamm.backend.payload.response.HeroItemResponse;
 import at.sebastianhamm.backend.repository.HeroItemRepository;

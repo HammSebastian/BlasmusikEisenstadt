@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.Remark;
-import at.sebastianhamm.backend.models.RemarkType;
+import at.sebastianhamm.backend.models.remark.Remark;
+import at.sebastianhamm.backend.models.remark.RemarkType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

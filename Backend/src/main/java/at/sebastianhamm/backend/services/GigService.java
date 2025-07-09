@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.services;
 
-import at.sebastianhamm.backend.models.EGigs;
-import at.sebastianhamm.backend.models.Gig;
+import at.sebastianhamm.backend.models.gig.enums.EGigs;
+import at.sebastianhamm.backend.models.gig.Gig;
 import at.sebastianhamm.backend.payload.response.GigResponse;
 
 import java.util.List;

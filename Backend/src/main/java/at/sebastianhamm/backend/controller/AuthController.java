@@ -4,7 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import at.sebastianhamm.backend.jwt.JwtUtils;
-import at.sebastianhamm.backend.models.*;
+import at.sebastianhamm.backend.models.common.HtmlTemplate;
+import at.sebastianhamm.backend.models.common.Mail;
+import at.sebastianhamm.backend.models.common.enums.ERole;
+import at.sebastianhamm.backend.models.user.Role;
+import at.sebastianhamm.backend.models.user.User;
 import at.sebastianhamm.backend.payload.request.LoginRequest;
 import at.sebastianhamm.backend.payload.request.SignupRequest;
 import at.sebastianhamm.backend.payload.response.MessageResponse;
@@ -13,7 +17,6 @@ import at.sebastianhamm.backend.repository.RoleRepository;
 import at.sebastianhamm.backend.repository.UserRepository;
 import at.sebastianhamm.backend.services.EmailService;
 import at.sebastianhamm.backend.services.impl.UserDetailsImpl;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -28,10 +31,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Authentication", description = "The authentication endpoint")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthenticationManager authenticationManager;
@@ -54,7 +56,7 @@ public class AuthController {
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(item -> item.getAuthority().replace("ROLE_", ""))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -130,14 +132,18 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("username", user.getUsername());
+        properties.put("email", user.getEmail());
+        properties.put("mirror", "https://stadtkapelle-eisenstadt.at/mirror-link"); // optional
+
         Mail mail = Mail.builder()
                 .from("no-reply@stadtkapelle-eisenstadt.at")
                 .to(user.getEmail())
                 .htmlTemplate(new HtmlTemplate("welcome-email", properties))
                 .subject("Willkommen bei Stadtkapelle Eisenstadt")
                 .build();
+
         emailService.sendWelcomeEmail(mail);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));

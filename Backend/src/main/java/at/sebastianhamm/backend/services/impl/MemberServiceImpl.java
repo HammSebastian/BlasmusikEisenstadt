@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.services.impl;
 
 import at.sebastianhamm.backend.exception.ConflictException;
-import at.sebastianhamm.backend.models.Member;
+import at.sebastianhamm.backend.models.user.Member;
 import at.sebastianhamm.backend.payload.response.MemberResponse;
 import at.sebastianhamm.backend.payload.response.RemarkResponse;
 import at.sebastianhamm.backend.repository.MemberRepository;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

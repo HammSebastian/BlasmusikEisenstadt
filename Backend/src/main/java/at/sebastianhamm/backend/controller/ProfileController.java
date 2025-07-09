@@ -3,7 +3,6 @@ package at.sebastianhamm.backend.controller;
 import at.sebastianhamm.backend.payload.response.ProfileResponse;
 import at.sebastianhamm.backend.repository.UserRepository;
 import at.sebastianhamm.backend.services.impl.UserDetailsImpl;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,10 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/profile")
-@Tag(name = "Profile", description = "The profile endpoint")
 @RequiredArgsConstructor
 public class ProfileController {
 

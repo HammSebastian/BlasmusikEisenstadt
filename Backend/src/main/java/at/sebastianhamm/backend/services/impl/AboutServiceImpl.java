@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.services.impl;
 
 import at.sebastianhamm.backend.exception.ConflictException;
-import at.sebastianhamm.backend.models.About;
+import at.sebastianhamm.backend.models.announcement.About;
 import at.sebastianhamm.backend.payload.response.AboutResponse;
 import at.sebastianhamm.backend.payload.response.MissionResponse;
 import at.sebastianhamm.backend.repository.AboutRepository;
@@ -25,8 +25,6 @@ public class AboutServiceImpl implements AboutService {
     public AboutResponse getAbout() {
         return aboutRepository.findByIdWithMissions(SINGLE_ABOUT_ID)
                 .map(about -> {
-                    System.out.println(">>> FOUND ABOUT WITH ID: " + about.getId());
-                    System.out.println(">>> MISSIONS SIZE: " + about.getMissions().size());
                     about.getMissions().forEach(m -> System.out.println(" - " + m.getTitle()));
                     return mapToResponse(about);
                 })
@@ -79,7 +77,6 @@ public class AboutServiceImpl implements AboutService {
     public AboutResponse mapToResponse(About about) {
         if (about == null) return null;
 
-        System.out.println("Mapping About with missions count: " + about.getMissions().size());
         about.getMissions().forEach(m -> System.out.println("Mission: " + m.getTitle()));
 
         return AboutResponse.builder()

@@ -1,9 +1,9 @@
 package at.sebastianhamm.backend.services.impl;
 
 import at.sebastianhamm.backend.exception.ConflictException;
-import at.sebastianhamm.backend.models.EGigs;
-import at.sebastianhamm.backend.models.Gig;
-import at.sebastianhamm.backend.models.GigType;
+import at.sebastianhamm.backend.models.gig.enums.EGigs;
+import at.sebastianhamm.backend.models.gig.Gig;
+import at.sebastianhamm.backend.models.gig.GigType;
 import at.sebastianhamm.backend.payload.response.GigResponse;
 import at.sebastianhamm.backend.repository.GigRepository;
 import at.sebastianhamm.backend.services.GigService;
@@ -51,10 +51,9 @@ public class GigServiceImpl implements GigService {
             existing.setVenue(gig.getVenue());
             existing.setAddress(gig.getAddress());
             existing.setImageUrl(gig.getImageUrl());
-            existing.setNote(gig.getNote());
+            existing.setAdditionalInfo(gig.getAdditionalInfo());
             existing.setDate(gig.getDate());
             existing.setTime(gig.getTime());
-            existing.setCreatedBy(gig.getCreatedBy());
             Gig updated = gigRepository.save(existing);
             return mapToResponse(updated);
         }).orElseThrow(() -> new ConflictException("Gig with id " + id + " does not exist"));
@@ -84,10 +83,9 @@ public class GigServiceImpl implements GigService {
                 .venue(gig.getVenue())
                 .address(gig.getAddress())
                 .imageUrl(gig.getImageUrl())
-                .note(gig.getNote())
+                .additionalInfo(gig.getAdditionalInfo())
                 .date(gig.getDate())
                 .time(gig.getTime())
-                .createdBy(gig.getCreatedBy())
                 .types(gig.getGigTypes().stream()
                         .map(type -> type.getEgigs().name())
                         .collect(java.util.stream.Collectors.toSet()))

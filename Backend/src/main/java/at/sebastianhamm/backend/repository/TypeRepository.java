@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.EType;
-import at.sebastianhamm.backend.models.Type;
+import at.sebastianhamm.backend.models.common.enums.EType;
+import at.sebastianhamm.backend.models.user.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

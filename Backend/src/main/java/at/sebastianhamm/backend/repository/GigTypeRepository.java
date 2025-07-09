@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.EGigs;
-import at.sebastianhamm.backend.models.GigType;
+import at.sebastianhamm.backend.models.gig.enums.EGigs;
+import at.sebastianhamm.backend.models.gig.GigType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

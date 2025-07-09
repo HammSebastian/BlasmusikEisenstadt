@@ -1,11 +1,10 @@
 package at.sebastianhamm.backend.controller;
 
 import at.sebastianhamm.backend.exception.ResourceNotFoundException;
-import at.sebastianhamm.backend.models.EGigs;
-import at.sebastianhamm.backend.models.Gig;
+import at.sebastianhamm.backend.models.gig.enums.EGigs;
+import at.sebastianhamm.backend.models.gig.Gig;
 import at.sebastianhamm.backend.payload.response.GigResponse;
 import at.sebastianhamm.backend.services.GigService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/public/gigs")
-@Tag(name = "Gigs", description = "The gig endpoint")
 @RequiredArgsConstructor
 public class GigController {
 

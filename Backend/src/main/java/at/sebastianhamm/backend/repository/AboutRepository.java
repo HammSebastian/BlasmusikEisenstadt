@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.About;
+import at.sebastianhamm.backend.models.announcement.About;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

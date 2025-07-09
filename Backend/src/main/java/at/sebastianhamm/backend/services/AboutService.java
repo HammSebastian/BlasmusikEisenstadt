@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.services;
 
-import at.sebastianhamm.backend.models.About;
+import at.sebastianhamm.backend.models.announcement.About;
 import at.sebastianhamm.backend.payload.response.AboutResponse;
 
 public interface AboutService {

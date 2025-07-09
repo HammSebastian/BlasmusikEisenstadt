@@ -25,6 +25,8 @@ export class Gigs implements OnInit {
             keywords: 'blasmusik, eisenstadt, musikverein, feuerwehrkapelle, stadtkapelle, konzerte, burgenland, musik, termine'
         });
 
+        window.scrollTo(0, 0);
+
         this.loadGigs();
     }
 

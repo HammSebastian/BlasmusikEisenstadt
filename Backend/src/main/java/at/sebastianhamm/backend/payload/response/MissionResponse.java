@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.payload.response;
 
-import at.sebastianhamm.backend.models.Mission;
+import at.sebastianhamm.backend.models.announcement.Mission;
 import lombok.*;
 
 @Getter

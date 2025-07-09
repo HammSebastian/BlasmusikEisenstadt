@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.Announcement;
-import at.sebastianhamm.backend.models.Type;
+import at.sebastianhamm.backend.models.announcement.Announcement;
+import at.sebastianhamm.backend.models.user.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

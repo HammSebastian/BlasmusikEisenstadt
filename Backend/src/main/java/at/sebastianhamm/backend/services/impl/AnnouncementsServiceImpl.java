@@ -1,9 +1,9 @@
 package at.sebastianhamm.backend.services.impl;
 
 import at.sebastianhamm.backend.exception.ConflictException;
-import at.sebastianhamm.backend.models.Announcement;
-import at.sebastianhamm.backend.models.EType;
-import at.sebastianhamm.backend.models.Type;
+import at.sebastianhamm.backend.models.announcement.Announcement;
+import at.sebastianhamm.backend.models.common.enums.EType;
+import at.sebastianhamm.backend.models.user.Type;
 import at.sebastianhamm.backend.payload.response.AnnouncementsResponse;
 import at.sebastianhamm.backend.repository.AnnouncementsRepository;
 import at.sebastianhamm.backend.services.AnnouncementsService;

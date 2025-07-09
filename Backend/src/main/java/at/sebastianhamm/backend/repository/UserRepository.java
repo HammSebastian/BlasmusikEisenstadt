@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.User;
+import at.sebastianhamm.backend.models.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

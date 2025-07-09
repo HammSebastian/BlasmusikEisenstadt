@@ -5,8 +5,6 @@ import {AuthService} from '../../core/services/essentials/auth.service';
 import {UserModel} from '../../core/models/essentials/user.model';
 import {RoleEnum} from '../../core/models/essentials/role.enum';
 
-;
-
 @Component({
     selector: 'app-auth',
     imports: [
@@ -26,19 +24,19 @@ export class Auth implements OnInit {
     isLoading = signal(false);
 
     loginForm: FormGroup;
+    errorMessage = signal<string>('');
 
     constructor() {
         this.loginForm = this.fb.group({
-            username: ['', [Validators.required]],
-            password: ['', [Validators.required]],
+            username: ['Admin', [Validators.required]],
+            password: ['MMBwQjz5LBcSZdBRdWep9Wd4kM5GZB75', [Validators.required]],
             remember: [false]
         });
     }
 
     ngOnInit() {
-        //check if user is already logged in
         if (this.authService.isAuthenticated()) {
-            this.router.navigate(['/member/dashboard']);
+            this.router.navigate(['/musician/dashboard']);
         }
     }
 
@@ -54,6 +52,7 @@ export class Auth implements OnInit {
     protected onSubmit(): void {
         if (this.loginForm.valid) {
             this.isLoading.set(true);
+            this.errorMessage.set('');
 
             const loginPayload = {
                 username: this.loginForm.value.username,
@@ -63,18 +62,27 @@ export class Auth implements OnInit {
 
             this.authService.login(loginPayload).subscribe({
                 next: (response) => {
-                    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/member/dashboard';
-                    this.router.navigate([returnUrl]);
-
                     this.isLoading.set(false);
                 },
                 error: (error) => {
-                    console.error('Login failed:', error);
-                    // Hier kannst du eine Fehleranzeige ergänzen
                     this.isLoading.set(false);
+
+                    // Use the error message from the server if available
+                    const errorMessage = error.message || error.error?.message;
+
+                    if (errorMessage) {
+                        this.errorMessage.set(errorMessage);
+                    } else if (error.status === 401) {
+                        this.errorMessage.set('Ungültiger Benutzername oder Passwort. Bitte versuchen Sie es erneut.');
+                    } else if (error.status === 403) {
+                        this.errorMessage.set('Zugriff verweigert. Sie haben keine Berechtigung für diese Aktion.');
+                    } else if (error.status === 0) {
+                        this.errorMessage.set('Verbindungsfehler. Bitte überprüfen Sie Ihre Internetverbindung.');
+                    } else {
+                        this.errorMessage.set('Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.');
+                    }
                 }
             });
         }
     }
-
 }

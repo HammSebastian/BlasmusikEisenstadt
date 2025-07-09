@@ -1,11 +1,8 @@
 package at.sebastianhamm.backend.payload.response;
 
-import at.sebastianhamm.backend.models.Remark;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

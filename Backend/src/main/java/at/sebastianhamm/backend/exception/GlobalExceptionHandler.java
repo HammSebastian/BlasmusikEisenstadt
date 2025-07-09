@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.exception;
 
-import at.sebastianhamm.backend.models.ErrorResponse;
+import at.sebastianhamm.backend.models.common.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

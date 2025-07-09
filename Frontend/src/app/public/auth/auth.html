@@ -74,17 +74,32 @@
                         }
                     </div>
 
+                    <!-- Error Message -->
+                    @if (errorMessage()) {
+                        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                            <span class="font-medium">Fehler!</span> {{ errorMessage() }}
+                        </div>
+                    }
+
                     <!-- Remember Me -->
-                    <div class="flex items-center">
-                        <input
-                            type="checkbox"
-                            id="remember"
-                            formControlName="remember"
-                            class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-secondary-300 rounded"
-                        />
-                        <label for="remember" class="ml-2 block text-sm text-secondary-700">
-                            Remember me
-                        </label>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input
+                                id="remember"
+                                formControlName="remember"
+                                type="checkbox"
+                                class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                            />
+                            <label for="remember" class="ml-2 block text-sm text-secondary-700">
+                                Angemeldet bleiben
+                            </label>
+                        </div>
+
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-primary-600 hover:text-primary-500">
+                                Passwort vergessen?
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Submit Button -->

@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.payload.response;
 
-import at.sebastianhamm.backend.models.Remark;
-import at.sebastianhamm.backend.models.RemarkType;
+import at.sebastianhamm.backend.models.remark.Remark;
+import at.sebastianhamm.backend.models.remark.RemarkType;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.repository;
 
-import at.sebastianhamm.backend.models.Member;
+import at.sebastianhamm.backend.models.user.Member;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

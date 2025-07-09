@@ -1,7 +1,7 @@
 package at.sebastianhamm.backend.services;
 
-import at.sebastianhamm.backend.models.Announcement;
-import at.sebastianhamm.backend.models.EType;
+import at.sebastianhamm.backend.models.announcement.Announcement;
+import at.sebastianhamm.backend.models.common.enums.EType;
 import at.sebastianhamm.backend.payload.response.AnnouncementsResponse;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package at.sebastianhamm.backend.services;
 
-import at.sebastianhamm.backend.models.Member;
+import at.sebastianhamm.backend.models.user.Member;
 import at.sebastianhamm.backend.payload.response.MemberResponse;
 
 import java.util.List;

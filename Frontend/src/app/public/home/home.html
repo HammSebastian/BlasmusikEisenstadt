@@ -63,11 +63,11 @@
                                         {{ announcement.message }}
                                     </p>
                                     <span class="text-sm text-secondary-500">
-                                        {{ announcement.startDate | date: 'yyyy-MM-dd' }}
+                                        {{ announcement.startDate | date: 'dd-MM-yyyy' }}
                                     </span>
                                     @if (announcement.endDate !== null) {
                                         <span class="text-sm text-secondary-500 ml-2">
-                                          - {{ announcement.endDate | date: 'yyyy-MM-dd' }}
+                                          - {{ announcement.endDate | date: 'dd-MM-yyyy' }}
                                         </span>
                                     }
                                 </div>
@@ -107,9 +107,6 @@
                             <p class="text-sm text-secondary-500">
                                 {{ gig.time }}
                             </p>
-                            <div class="mt-4">
-                                <a routerLink="/gigs/{{ gig.id }}" class="btn-primary">Details</a>
-                            </div>
                         </div>
                     }
                 </div>

@@ -45,10 +45,5 @@ export const publicModule: Routes = [
         path: 'auth/login',
         loadComponent: () => import('./auth/auth').then(m => m.Auth),
         title: 'Login',
-    },
-    {
-        path: '**',
-        loadComponent: () => import('./../essentials/not-found/not-found').then(m => m.NotFound),
-        title: 'Seite nicht gefunden',
     }
 ]
