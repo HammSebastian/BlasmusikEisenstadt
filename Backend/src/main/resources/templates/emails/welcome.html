@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willkommen bei der Blasmusik Eisenstadt</title>
+    <style>
+        body {
+            font-family: 'Open Sans', Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .header img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        h3 {
+            color: #002222;
+            font-weight: 300;
+        }
+        p {
+            color: #002222;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .footer {
+            font-size: 13px;
+            color: #555;
+            margin-top: 30px;
+        }
+        .mirror-link {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        a {
+            color: #002222;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="mirror-link">
+        <a th:href="${mirror}">E-Mail im Browser anzeigen</a>
+    </div>
+
+    <div class="header">
+        <img src="../../static/images/Logo.png" alt="Header Bild">
+    </div>
+
+    <h3>Hallo <span th:text="${username}">Benutzer</span>,</h3>
+
+    <p>Herzlich Willkommen in unserem Mitgliederbereich der Blasmusik Eisenstadt!</p>
+    <p>Wir freuen uns sehr, dass Sie Teil unseres Vereins sind.</p>
+    <p>Mit Ihrem Konto haben Sie Zugriff auf exklusive Inhalte, können sich über kommende Auftritte informieren und eintragen.</p>
+    <p>Falls Sie Fragen haben oder Hilfe benötigen, zögern Sie bitte nicht, uns zu kontaktieren.</p>
+
+    <p>Mit musikalischen Grüßen,<br>Ihr Team der Blasmusik Eisenstadt</p>
+
+    <div class="footer">
+        <p>&copy; 2025 Blasmusik Eisenstadt. Alle Rechte vorbehalten.</p>
+        <p>Ein Admin der Website hat einen Account mit dieser E-Mail-Adresse angelegt.<br>
+            Wenn Sie dieses Konto nicht angefordert haben, wenden Sie sich bitte an
+            <a href="mailto:support@stadtkapelle-eisenstadt.at">support@stadtkapelle-eisenstadt.at</a>.</p>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <img src="https://img.mailinblue.com/6547423/images/content_library/original/65b3be0c00f7d34d4e5bf7a3.jpeg" alt="Abschlussbild" style="width: 100%; border-radius: 8px;">
+    </div>
+</div>
+</body>
+</html>

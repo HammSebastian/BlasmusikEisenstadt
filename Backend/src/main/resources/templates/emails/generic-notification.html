@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Benachrichtigung von Blasmusik Eisenstadt</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header { 
+            text-align: center; 
+            padding: 20px 0; 
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .content { 
+            padding: 20px; 
+            line-height: 1.7;
+        }
+        .button {
+            display: inline-block; 
+            padding: 12px 24px; 
+            background-color: #4CAF50; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 30px; 
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.85em; 
+            color: #777; 
+            background-color: #f9f9f9;
+            border-radius: 0 0 5px 5px;
+        }
+        .notification-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .unsubscribe {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://www.blasmusik-eisenstadt.at/logo.png" alt="Blasmusik Eisenstadt Logo" class="logo" th:src="|${appUrl}/images/logo.png|">
+            <h2 style="margin: 10px 0 0 0; color: #2c3e50;">Blasmusik Eisenstadt</h2>
+        </div>
+        
+        <div class="content">
+            <p>Hallo <span th:text="${name}">Mitglied</span>,</p>
+            
+            <div class="notification-card" th:if="${title != null}">
+                <h3 style="margin-top: 0; color: #2c3e50;" th:text="${title}">Titel der Benachrichtigung</h3>
+                <div th:if="${subtitle != null}" style="color: #555; margin-bottom: 10px;" th:text="${subtitle}">Untertitel oder zusätzliche Informationen</div>
+                <div th:if="${content != null}" style="color: #333;" th:utext="${content}">
+                    Hier steht der Hauptinhalt Ihrer Benachrichtigung. Sie können HTML-Formatierungen verwenden.
+                </div>
+            </div>
+            
+            <div th:if="${buttonUrl != null && buttonText != null" style="text-align: center; margin: 25px 0;">
+                <a th:href="${buttonUrl}" class="button" style="background-color: #4CAF50;" th:text="${buttonText}">Zum Mitgliederbereich</a>
+            </div>
+            
+            <p th:if="${additionalInfo != null}" style="color: #555; font-size: 0.9em;" th:utext="${additionalInfo}">
+                Zusätzliche Informationen oder Anweisungen können hier platziert werden.
+            </p>
+            
+            <p>Mit freundlichen Grüßen,<br>Ihr Team der Blasmusik Eisenstadt</p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 Blasmusik Eisenstadt. Alle Rechte vorbehalten.</p>
+            <p>
+                <a th:href="${appUrl}/kontakt" style="color: #4CAF50; text-decoration: none;">Kontakt</a> | 
+                <a th:href="${appUrl}/impressum" style="color: #4CAF50; text-decoration: none;">Impressum</a> | 
+                <a th:href="${appUrl}/datenschutz" style="color: #4CAF50; text-decoration: none;">Datenschutz</a>
+            </p>
+            <div class="unsubscribe">
+                <p>Sie erhalten diese E-Mail, weil Sie Mitglied bei Blasmusik Eisenstadt sind. 
+                <a th:href="${appUrl}/profile/notifications" style="color: #4CAF50;">E-Mail-Einstellungen anpassen</a> | 
+                <a th:href="${unsubscribeUrl}" style="color: #4CAF50;" th:if="${unsubscribeUrl != null}">Alle E-Mails abbestellen</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

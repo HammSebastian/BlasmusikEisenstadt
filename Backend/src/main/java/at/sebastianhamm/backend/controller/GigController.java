@@ -1,64 +1,97 @@
 package at.sebastianhamm.backend.controller;
 
-import at.sebastianhamm.backend.exception.ResourceNotFoundException;
-import at.sebastianhamm.backend.models.gig.enums.EGigs;
-import at.sebastianhamm.backend.models.gig.Gig;
+import at.sebastianhamm.backend.exceptions.NotFoundException;
+import at.sebastianhamm.backend.payload.request.GigRequest;
+import at.sebastianhamm.backend.payload.response.ApiResponse;
 import at.sebastianhamm.backend.payload.response.GigResponse;
-import at.sebastianhamm.backend.services.GigService;
+import at.sebastianhamm.backend.service.GigService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
-@RequestMapping("/public/gigs")
+@RequestMapping("/gigs")
 @RequiredArgsConstructor
 public class GigController {
 
+    private static final Logger logger = LoggerFactory.getLogger(GigController.class);
     private final GigService gigService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public List<GigResponse> getAllGigs() {
-        return gigService.getAllGigs();
+    public ResponseEntity<ApiResponse<List<GigResponse>>> getAllGigs() {
+        logger.info("Fetching all gigs");
+
+        if (gigService.getAllGigs().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "No gigs found", null));
+        }
+
+        List<GigResponse> gigs = gigService.getAllGigs();
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Gigs fetched successfully", gigs));
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public GigResponse getGigById(@PathVariable Long id) {
-        return gigService.getGigById(id)
-                .map(gigService::mapToResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Gig not found with id: " + id));
+    public ResponseEntity<ApiResponse<GigResponse>> getGigById(@PathVariable Long id) {
+        logger.info("Fetching gig with id {}", id);
+
+        if (gigService.getGigById(id).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "Gig not found", null));
+        }
+        GigResponse gig = gigService.getGigById(id)
+                .orElseThrow(() -> new NotFoundException("Gig not found with id: " + id));
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Gig fetched successfully", gig));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_REPORTER')")
-    @ResponseStatus(HttpStatus.CREATED)
-    public GigResponse createGig(@Valid @RequestBody Gig gig) {
-        return gigService.createGig(gig);
+    @PreAuthorize("hasRole('ADMIN') || hasRole('REPORTER')")
+    public ResponseEntity<ApiResponse<GigResponse>> createGig(@Valid @RequestBody GigRequest gig) {
+        logger.info("Creating new gig");
+
+        if (gig.getLocationId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Location must be set", null));
+        }
+        ApiResponse<GigResponse> created = gigService.createGig(gig);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_REPORTER')")
-    @ResponseStatus(HttpStatus.OK)
-    public GigResponse updateGig(@PathVariable Long id, @Valid @RequestBody Gig gig) {
-        return gigService.updateGig(id, gig);
+    @PreAuthorize("hasRole('ADMIN') || hasRole('REPORTER')")
+    public ResponseEntity<ApiResponse<GigResponse>> updateGig(@PathVariable Long id, @Valid @RequestBody GigRequest gig) {
+        logger.info("Updating gig with id {}", id);
+
+        if (gigService.getGigById(id).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "Gig not found", null));
+        }
+
+        if (gig.getLocationId() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "Location must be set", null));
+        }
+        ApiResponse<GigResponse> updated = gigService.updateGig(id, gig);
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_REPORTER')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGig(@PathVariable Long id) {
-        gigService.deleteGig(id);
-    }
+    @PreAuthorize("hasRole('ADMIN') || hasRole('REPORTER')")
+    public ResponseEntity<ApiResponse<Void>> deleteGig(@PathVariable Long id) {
+        logger.info("Deleting gig with id {}", id);
 
-    @GetMapping("/type/{type}")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Gig> getGigsByType(@PathVariable EGigs type) {
-        return gigService.findByType(type);
+        if (gigService.getGigById(id).isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "Gig not found", null));
+        }
+        gigService.deleteGigById(id);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Gig deleted successfully", null));
     }
 }
