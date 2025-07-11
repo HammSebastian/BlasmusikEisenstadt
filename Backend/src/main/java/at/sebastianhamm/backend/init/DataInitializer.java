@@ -30,7 +30,9 @@ public class DataInitializer {
     public void init() {
         // Admin User anlegen
         Optional<User> adminOpt = userRepository.findByEmail("admin@stadtkapelle-eisenstadt.at");
+        Optional<User> memberOpt = userRepository.findByEmail("member@stadtkapelle-eisenstadt.at");
         User admin;
+        User member;
 
         if (adminOpt.isEmpty()) {
             admin = new User();
@@ -43,6 +45,19 @@ public class DataInitializer {
             admin = userRepository.save(admin);
         } else {
             admin = adminOpt.get();
+        }
+
+        if (memberOpt.isEmpty()) {
+            member = new User();
+            member.setUsername("member");
+            member.setEmail("member@stadtkapelle-eisenstadt.at");
+            member.setPassword(passwordEncoder.encode("Stadtkapelle1!")); // unbedingt später ändern
+            member.setRole(Role.USER);
+            member.setCreatedAt(LocalDateTime.now());
+            member.setUpdatedAt(LocalDateTime.now());
+            member = userRepository.save(member);
+        } else {
+            member = memberOpt.get();
         }
 
         // Locations prüfen und ggf. erstellen
@@ -122,7 +137,6 @@ public class DataInitializer {
 
             rehearsalRepository.saveAll(List.of(rehearsal1, rehearsal2));
 
-            // Participations direkt anlegen (Beispieldaten)
             Participation p1 = Participation.builder()
                     .user(admin)
                     .rehearsal(rehearsal1)

@@ -13,4 +13,6 @@ public interface RehearsalRepository extends JpaRepository<Rehearsal, Long> {
     List<Rehearsal> findByLocation(Location location);
     List<Rehearsal> findByDate(LocalDate date);
     List<Rehearsal> findByTitleContainingIgnoreCase(String title);
+
+    Rehearsal getById(Long id);
 }

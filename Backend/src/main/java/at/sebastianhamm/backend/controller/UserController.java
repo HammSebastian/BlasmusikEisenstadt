@@ -3,6 +3,7 @@ package at.sebastianhamm.backend.controller;
 import at.sebastianhamm.backend.payload.request.LoginRequest;
 import at.sebastianhamm.backend.payload.request.RegisterRequest;
 import at.sebastianhamm.backend.payload.response.ApiResponse;
+import at.sebastianhamm.backend.payload.response.UserResponse;
 import at.sebastianhamm.backend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,9 +47,21 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<?>> getCurrentLoggedInUser(){
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentLoggedInUser(){
         logger.info("Fetching current logged in user");
-        return ResponseEntity.ok(userService.getCurrentLoggedInUser());
+
+        if (userService.getCurrentLoggedInUser().getData() == null) {
+            return ResponseEntity.status(404)
+                    .body(new ApiResponse<>(404, "User not found", null));
+        }
+        UserResponse userResponse = userService.currentLoggedInUser().getData();
+
+        if (userResponse == null) {
+            return ResponseEntity.status(404)
+                    .body(new ApiResponse<>(404, "User not found", null));
+        }
+
+        return ResponseEntity.ok(new ApiResponse<>(200, "User fetched successfully", userResponse));
     }
 
 

@@ -5,7 +5,9 @@ import at.sebastianhamm.backend.entity.Participation;
 import at.sebastianhamm.backend.entity.Rehearsal;
 import at.sebastianhamm.backend.entity.User;
 import at.sebastianhamm.backend.enums.ParticipationStatus;
+import at.sebastianhamm.backend.enums.Role;
 import at.sebastianhamm.backend.exceptions.BadRequestException;
+import at.sebastianhamm.backend.exceptions.UnauthorizedException;
 import at.sebastianhamm.backend.payload.request.ParticipationRequest;
 import at.sebastianhamm.backend.payload.response.ApiResponse;
 import at.sebastianhamm.backend.payload.response.ParticipationResponse;
@@ -20,7 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,28 +123,45 @@ public class ParticipationServiceImpl implements ParticipationService {
 
     @Override
     public Optional<ParticipationResponse> getParticipationByRehearsalId(Long rehearsalId) {
-
-        if (rehearsalId == null) {
-            throw new BadRequestException("Rehearsal ID must be provided");
+        ApiResponse<User> response = userService.getCurrentLoggedInUser();
+        if (response.getData() == null) {
+            throw new BadRequestException("Unauthorized");
         }
 
         Rehearsal rehearsal = rehearsalRepository.findById(rehearsalId)
-                .orElseThrow(() -> new BadRequestException("Rehearsal not found with id: " + rehearsalId));
+                .orElseThrow(() -> new BadRequestException("Rehearsal not found"));
 
-        return participationRepository.findParticipationByRehearsal(rehearsal)
+        return participationRepository.findByUserAndRehearsal(response.getData(), rehearsal)
                 .map(ParticipationResponse::fromParticipation);
     }
 
     @Override
     public Optional<ParticipationResponse> getParticipationByGigId(Long gigId) {
-        if (gigId == null) {
-            throw new BadRequestException("Gig ID must be provided");
+        ApiResponse<User> response = userService.getCurrentLoggedInUser();
+        if (response.getData() == null) {
+            throw new BadRequestException("Unauthorized");
         }
 
         Gig gig = gigRepository.findById(gigId)
-                .orElseThrow(() -> new BadRequestException("Gig not found with id: " + gigId));
+                .orElseThrow(() -> new BadRequestException("Gig not found"));
 
-        return participationRepository.findParticipationByGig(gig)
+        return participationRepository.findByUserAndGig(response.getData(), gig)
                 .map(ParticipationResponse::fromParticipation);
+    }
+
+    @Override
+    public List<ParticipationResponse> findAllByRehearsal(Rehearsal rehearsal) {
+        return participationRepository.findAllByRehearsal(rehearsal)
+                .stream()
+                .map(ParticipationResponse::fromParticipation)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ParticipationResponse> findAllByGig(Gig gig) {
+        return participationRepository.findAllByGig(gig)
+                .stream()
+                .map(ParticipationResponse::fromParticipation)
+                .collect(Collectors.toList());
     }
 }

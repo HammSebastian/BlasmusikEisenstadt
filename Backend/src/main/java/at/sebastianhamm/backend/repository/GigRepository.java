@@ -44,4 +44,6 @@ public interface GigRepository extends JpaRepository<Gig, Long> {
 
     // 🔹 Existenzprüfung
     boolean existsByUserIdAndDateAndTitle(Long userId, LocalDate date, String title);
+
+    Gig getById(Long id);
 }

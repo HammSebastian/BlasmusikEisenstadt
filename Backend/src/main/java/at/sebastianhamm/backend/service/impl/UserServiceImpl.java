@@ -238,4 +238,30 @@ public class UserServiceImpl implements UserService {
                 .message("Refresh token is valid")
                 .build();
     }
+
+    @Override
+    public ApiResponse<UserResponse> currentLoggedInUser() {
+        User user = getCurrentLoggedInUser().getData();
+        if (user == null) {
+            return new ApiResponse<>(
+                HttpStatus.NOT_FOUND.value(),
+                "User not found",
+                null
+            );
+        }
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(user.getId());
+        userResponse.setUsername(user.getUsername());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setRole(user.getRole());
+        userResponse.setCreatedAt(user.getCreatedAt());
+        userResponse.setUpdatedAt(user.getUpdatedAt());
+
+        return new ApiResponse<>(
+                HttpStatus.OK.value(),
+                "User fetched successfully",
+                userResponse
+        );
+    }
 }
