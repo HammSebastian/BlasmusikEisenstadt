@@ -1,7 +1,0 @@
-export enum RoleEnum {
-    ADMIN = 'ADMIN',
-    REPORTER = 'REPORTER',
-    CONDUCTOR = 'DIRIGENT',
-    SECTION_LEADER = 'REGISTERFÜHRER',
-    MUSICIAN = 'MUSIKANT'
-}
