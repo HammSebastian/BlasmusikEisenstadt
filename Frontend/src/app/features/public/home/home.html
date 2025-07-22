@@ -1,0 +1,99 @@
+<div class="w-full mx-auto">
+    <section
+        class="relative bg-cover bg-center h-screen flex items-center justify-center text-white"
+        [style.background-image]="backgroundStyle()"
+    >
+        @if (homeSectionLoading()) {
+            <app-loading></app-loading>
+        } @else if (!homeSectionLoading() && !homeSectionError()) {
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+            <div class="relative z-10 text-center px-4">
+                <h1
+                    class="text-5xl md:text-7xl font-extrabold leading-tight mb-4 animate-fade-in-up"
+                >
+                    {{ title() }}
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 animate-fade-in-up animate-delay-200">
+                    {{ subTitle() }}
+                </p>
+                <a
+                    href="/events"
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out transform hover:scale-105 animate-fade-in-up animate-delay-400"
+                >
+                    {{ buttonText() }}
+                </a>
+            </div>
+        } @else {
+            <app-error-message [errorMessage]="homeSectionErrorMessage()"></app-error-message>
+        }
+    </section>
+
+    <section class="py-16">
+        <div class="container mx-auto px-4 text-center justify-center items-center">
+            <h2 class="text-4xl font-bold mb-12">&Uuml;ber uns</h2>
+
+            @if (aboutSectionLoading()) {
+                <app-loading></app-loading>
+            } @else if (!aboutSectionLoading() && !aboutSectionError()) {
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/2">
+                        <img
+                            [src]="aboutImage()"
+                            alt="Über uns"
+                            class="rounded-lg shadow-xl w-full h-auto object-cover"
+                        />
+                    </div>
+                    <div class="md:w-1/2 text-lg leading-relaxed">
+                        <p class="mb-4">
+                            {{ aboutText() }}
+                        </p>
+                        <a href="/about" class="text-blue-600 hover:underline font-semibold"
+                        >Mehr &uuml;ber uns erfahren &rarr;</a
+                        >
+                    </div>
+                </div>
+            } @else {
+                <app-error-message [errorMessage]="aboutSectionErrorMessage()"></app-error-message>
+            }
+        </div>
+    </section>
+
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Aktuelles</h2>
+
+            @if (eventSectionLoading()) {
+                <app-loading></app-loading>
+            } @else if (!eventSectionLoading() && !eventSectionError()) {
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @for (event of events(); track event.id) {
+                        <div class="rounded-lg shadow-lg overflow-hidden">
+                            <img
+                                [src]="event.eventImage"
+                                alt="{{ event.title }}"
+                                class="w-full h-auto object-cover"
+                            />
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2">{{ event.title }}</h3>
+                                <p class="text-sm mb-4">
+                                    {{ event.date }} | {{ event.location.city }},
+                                    {{ event.location.street }}
+                                </p>
+                                <p class="mb-4">
+                                    {{ event.description }}
+                                </p>
+                                <a
+                                    href="/events/{{ event.id }}"
+                                    class="text-blue-600 hover:underline font-semibold"
+                                >Mehr erfahren &rarr;</a
+                                >
+                            </div>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <app-error-message [errorMessage]="eventSectionErrorMessage()"></app-error-message>
+            }
+        </div>
+    </section>
+</div>

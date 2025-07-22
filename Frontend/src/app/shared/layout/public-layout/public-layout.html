@@ -1,0 +1,95 @@
+<div class="min-h-screen flex flex-col mt-0">
+    <nav class="top-0 z-50 shadow-lg bg-gray-100 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3 flex-shrink-0 min-w-0">
+                    <img [src]="themeService.isDarkMode() ? 'assets/images/Logo.png' : 'assets/images/Logo_Black.png'"
+                         class="h-16 w-auto p-1 block" alt="Logo"/>
+                    <p class="text-2xl font-bold truncate whitespace-nowrap">Stadtkapelle Eisenstadt</p>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-4">
+                    @for (link of navLinks; track link.url) {
+                        <a [routerLink]="link.url"
+                           class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-300 hover:text-blue-800 transition-colors">{{ link.label }}
+                        </a>
+                    }
+
+                    <button (click)="themeService.toggleTheme()"
+                            class="p-3 rounded-full hover:bg-blue-300 hover:text-blue-800 focus:outline-none transition-colors"
+                            [title]="themeService.isDarkMode() ? 'Wechsel zu Light Mode' : 'Wechsel zu Dark Mode'">
+                        <app-theme-icon [darkMode]="themeService.isDarkMode()"></app-theme-icon>
+                    </button>
+
+                    @if (isAuthenticated$ | async) {
+                        <button (click)="navigateToDashboard()"
+                                class="m-2 ml-auto px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                            Zum Dashboard
+                        </button>
+
+                        <button (click)="logout()"
+                                class="ml-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+                            Ausloggen
+                        </button>
+                    } @else {
+                        <button (click)="login()"
+                                class="ml-auto px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                            Einloggen
+                        </button>
+                    }
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button (click)="toggleMenu()"
+                            class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-blue-300 hover:text-blue-800 focus:outline-none transition-colors">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="md:hidden shadow-md transition-all duration-300 ease-in-out bg-gray-100 dark:bg-gray-800"
+             [ngClass]="isMenuOpen() ? 'max-h-screen py-2' : 'max-h-0 overflow-hidden'">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                @for (link of navLinks; track link.url) {
+                    <a [routerLink]="link.url"
+                       class="block px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-300 hover:text-blue-800 transition-colors">
+                        {{ link.label }}
+                    </a>
+                }
+
+                @if (isAuthenticated$ | async) {
+                    <button (click)="navigateToDashboard()"
+                            class="w-full mt-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                        Zum Dashboard
+                    </button>
+
+                    <button (click)="logout()"
+                            class="w-full mt-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+                        Logout
+                    </button>
+                } @else {
+                    <button (click)="login()"
+                            class="w-full mt-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                        Login
+                    </button>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow">
+        <router-outlet></router-outlet>
+    </main>
+
+    <app-footer [currentYear]="currentYear"></app-footer>
+
+    @if (isLoading()) {
+        <app-loading-overlay></app-loading-overlay>
+    }
+</div>

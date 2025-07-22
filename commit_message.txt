@@ -1,0 +1,23 @@
+feat: Initial setup of Blasmusik Eisenstadt web application
+
+This commit establishes the foundation for the Blasmusik Eisenstadt web application with both frontend and backend components:
+
+Frontend:
+- Set up Angular project structure with core modules and components
+- Create data models for members, events, and other domain objects
+- Add enums for event types, instruments, and sections
+- Include initial assets (logos, images) for the organization
+- Implement routing and layout components
+
+Backend:
+- Develop Java Spring Boot backend with entity models
+- Create REST API endpoints with request/response DTOs
+- Implement service layer for business logic
+- Set up configuration for API documentation
+
+This initial implementation provides the core functionality for managing:
+- Organization members and their details
+- Various event types (concerts, gigs, serenades)
+- About section and news content
+
+The application will serve as a comprehensive management system for the Blasmusik Eisenstadt organization.

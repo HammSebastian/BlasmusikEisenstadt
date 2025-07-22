@@ -1,0 +1,67 @@
+<section class="py-16 min-h-screen bg-gradient-to-br">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12 text-blue-800">Unsere Mitglieder</h2>
+
+        <!-- Filter -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <select [(ngModel)]="filterSection" class="p-3 rounded-xl border shadow-sm">
+                <option value="">Alle Register</option>
+                @for (section of sectionEnums(); track section) {
+                    <option [value]="section">{{ section | translationSection }}</option>
+                }
+            </select>
+
+            <select [(ngModel)]="filterInstrument" class="p-3 rounded-xl border shadow-sm">
+                <option value="">Alle Instrumente</option>
+                @for (instrument of instrumentEnums(); track instrument) {
+                    <option [value]="instrument">{{ instrument | translationInstrument }}</option>
+                }
+            </select>
+
+            <select [(ngModel)]="sortOption" class="p-3 rounded-xl border shadow-sm">
+                <option value="lastName">Nachname A-Z</option>
+                <option value="firstName">Vorname A-Z</option>
+                <option value="oldest">Ältestes Mitglied zuerst</option>
+            </select>
+
+            <button (click)="resetFilters()"
+                    class="p-3 rounded-xl bg-red-500 text-white shadow-sm hover:bg-red-600 transition">
+                Zurücksetzen
+            </button>
+        </div>
+
+        @if (memberSectionLoading()) {
+            <div class="flex justify-center items-center">
+                <app-loading></app-loading>
+            </div>
+        } @else if (!memberSectionLoading() && !memberSectionError()) {
+            <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                @for (member of filteredMembers(); track member.lastName) {
+                    <div
+                        class="bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group transform hover:-translate-y-1"
+                    >
+                        <img
+                            [src]="member.avatarUrl"
+                            alt="{{ member.firstName }} {{ member.lastName }}"
+                            class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div class="p-6 flex flex-col gap-2">
+                            <h3 class="text-xl font-bold text-gray-800">{{ member.firstName }} {{ member.lastName }}</h3>
+                            <p class="text-sm text-gray-600 italic">{{ member.instrument | translationInstrument }}</p>
+                            <p class="text-sm text-gray-500">Register: {{ member.section | translationSection }}</p>
+                            <p class="text-xs text-gray-400">Mitglied seit {{ member.dateJoined }}</p>
+
+                            @if (member.notes) {
+                                <p class="text-sm text-gray-700 mt-2">„{{ member.notes }}“</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="flex justify-center items-center">
+                <app-error-message [errorMessage]="memberSectionErrorMessage()"></app-error-message>
+            </div>
+        }
+    </div>
+</section>

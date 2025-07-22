@@ -1,67 +1,64 @@
+/**
+ * Copyright (c) 2025 Sebastian Hamm. All Rights Reserved.
+ *
+ * @author Sebastian Hamm
+ * @version 1.0.0
+ * @since 7/22/25
+ */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.RoleEnum;
-import jakarta.annotation.PostConstruct;
+
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.InstrumentEnum;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.SectionEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Data
-@RequiredArgsConstructor
 @Entity
 @Table(name = "members")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
 public class MemberEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
-    //------------------| Required |------------------//
-    @Column(unique = true, nullable = false)
-    @NotNull(message = "Email is required")
-    private String email;
-
-    @Column(nullable = false)
-    @NotNull(message = "Password is required")
-    private String password;
-
-    @Column(nullable = false)
-    @NotNull(message = "Firstname is required")
+    @Column(name = "firstname")
     private String firstName;
 
-    @Column(nullable = false)
-    @NotNull(message = "Lastname is required")
+    @Column(name = "lastname")
     private String lastName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @NotNull(message = "Role is required")
-    private RoleEnum role;
+    @Column(name = "instrument")
+    private InstrumentEnum instrument;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by_id")
-    @NotNull(message = "Created by is required")
-    private MemberEntity createdBy;
-
-    @Column(nullable = false)
-    @NotNull(message = "Avatar URL is required")
+    @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(nullable = false)
-    @NotNull(message = "Email notification is required")
-    private String emailNotification;
+    @Column(name = "date_joined")
+    private LocalDate dateJoined;
 
-    //------------------| Optional |------------------//
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "section")
+    private SectionEnum section;
 
-
-    //------------------| Init |------------------//
-    @PostConstruct
-    public void init() {
-        createdAt = LocalDate.now();
-    }
+    //--------------------------------| Optional Fields |----------------------------------------
+    private String notes;
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+    private String phoneNumber;
+    private String number;
+    private String street;
+    private String zipCode;
+    private String city;
+    private String country;
+    //-------------------------------------------------------------------------------------------
 }

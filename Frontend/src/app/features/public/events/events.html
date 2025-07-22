@@ -1,0 +1,31 @@
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Aktuelles</h2>
+        @if (eventSectionLoading()) {
+            <app-loading></app-loading>
+        } @else if(!eventSectionLoading() && !eventSectionError()) {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @for (event of events(); track event.id) {
+                    <div class="rounded-lg shadow-lg overflow-hidden">
+                        <img [src]="event.eventImage" alt="{{ event.title}}"
+                             class="w-full h-auto object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">{{ event.title }}</h3>
+                            <p class="text-sm mb-4">
+                                {{ event.date }} | {{ event.location.city }}, {{ event.location.street }}
+                            </p>
+                            <p class="mb-4">
+                                {{ event.description }}
+                            </p>
+                            <a href="/events/{{ event.id }}" class="text-blue-600 hover:underline font-semibold">
+                                Mehr erfahren &rarr;
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <app-error-message [errorMessage]="eventSectionErrorMessage()"></app-error-message>
+        }
+    </div>
+</section>

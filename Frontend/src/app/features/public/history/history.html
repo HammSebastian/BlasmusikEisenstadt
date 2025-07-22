@@ -1,0 +1,39 @@
+<section class="py-16  min-h-screen">
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Unsere Geschichte</h2>
+
+        @if (loading()) {
+            <app-loading></app-loading>
+        } @else if (!loading() && !error()) {
+            <div class="relative border-l-4 border-blue-600 mx-auto max-w-4xl">
+
+                @for (item of sectionsWithIndex() ?? []; track item.section.year) {
+                    <div
+                        class="mb-10 ml-6 relative group opacity-0 translate-x-8 transition duration-700 ease-out"
+                        [attr.data-index]="item.index"
+                        [class.opacity-100]="visibleItems.includes(item.index)"
+                        [class.translate-x-0]="visibleItems.includes(item.index)"
+                        [class.translate-x-8]="!visibleItems.includes(item.index)"
+                        [class.md:ml-auto]="item.index % 2 !== 0"
+                        [class.md:text-right]="item.index % 2 !== 0"
+                    >
+                        <span
+                            class="absolute -left-6 top-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow">
+
+                        </span>
+
+                        <div
+                            class="p-6 rounded-md shadow-md md:max-w-md">
+                            <h3 class="text-xl font-semibold ">{{ item.section.year }}</h3>
+                            <p>{{ item.section.description }}</p>
+                        </div>
+                    </div>
+
+
+                }
+            </div>
+        } @else {
+            <app-error-message [errorMessage]="errorMessage()"></app-error-message>
+        }
+    </div>
+</section>

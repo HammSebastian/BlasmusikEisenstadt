@@ -1,0 +1,38 @@
+<footer class="py-8 border-t border-gray-700 shadow-2xl">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="border-r border-gray-700">
+            <h3 class="text-xl font-bold mb-4 text-center">Navigation</h3>
+            <ul>
+                @for (link of navLinks; track link.url) {
+                    <li [routerLink]="link.url" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-300 text-center">{{ link.label }}
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <h3 class="text-xl font-bold mb-4">Unser Standort</h3>
+            <div class="w-full h-full rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d375.6936829211772!2d16.53569976069702!3d47.84657116604198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476c4822727517fb%3A0x3eb6cae910e906c3!2sStadtkapelle%20Eisenstadt!5e0!3m2!1sde!2sat!4v1752708964801!5m2!1sde!2sat"
+                    width="100%" height="250px" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+
+        <div class="border-l border-gray-700 text-center">
+            <h3 class="text-xl font-bold mb-4">Kontakt</h3>
+            <p>Stadtkapelle Eisenstadt</p>
+            <p>Neusiedler Straße 2b</p>
+            <p>7000 Eisenstadt, Österreich</p>
+            <p>E-Mail: <a href="mailto:info@stadtkapelle-eisenstadt.at" class="hover:text-blue-300  underline">info&commat;stadtkapelle-eisenstadt.at</a></p>
+        </div>
+
+    </div>
+
+    <div class="mt-12 pt-4 border-t border-gray-700 text-center text-sm">
+        <p>© {{ currentYear }} Stadtkapelle Eisenstadt. Alle Rechte vorbehalten.
+            | <a routerLink="/privacy" class="hover:text-blue-300">Datenschutz</a>
+            | <a routerLink="/imprint" class="hover:text-blue-300">Impressum</a></p>
+    </div>
+</footer>
