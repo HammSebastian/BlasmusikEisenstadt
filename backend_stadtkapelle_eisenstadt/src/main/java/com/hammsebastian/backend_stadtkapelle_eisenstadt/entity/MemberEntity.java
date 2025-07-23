@@ -1,62 +1,102 @@
 /**
  * Copyright (c) 2025 Sebastian Hamm. All Rights Reserved.
  *
+ * Represents a member of the music association.
+ *
  * @author Sebastian Hamm
- * @version 1.0.0
+ * @version 1.1.0
  * @since 7/22/25
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
-
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.embeddable.Address;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.InstrumentEnum;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.SectionEnum;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "members")
-@AllArgsConstructor
-@NoArgsConstructor
+// Lombok annotations
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = {"dateOfBirth", "phoneNumber", "address"}) // Exclude sensitive/complex fields
+@EqualsAndHashCode(of = "id")
+
+// JPA annotations
+@Entity
+@Table(name = "members")
 public class MemberEntity {
 
+    /**
+     * The unique identifier for the member.
+     */
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "firstname")
-    private String firstName;
+    /**
+     * The first name of the member. Mandatory.
+     */
+    @Column(name = "first_name", nullable = false, length = 100)
+    private String firstName; //
 
-    @Column(name = "lastname")
-    private String lastName;
+    /**
+     * The last name of the member. Mandatory.
+     */
+    @Column(name = "last_name", nullable = false, length = 100)
+    private String lastName; //
 
+    /**
+     * The primary instrument the member plays. Mandatory.
+     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "instrument")
-    private InstrumentEnum instrument;
+    @Column(name = "instrument", nullable = false)
+    private InstrumentEnum instrument; //
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
+    /**
+     * The URL to the member's profile picture. Optional.
+     */
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl; //
 
-    @Column(name = "date_joined")
-    private LocalDate dateJoined;
+    /**
+     * The date the member joined the association. Mandatory.
+     */
+    @Column(name = "date_joined", nullable = false)
+    private LocalDate dateJoined; //
 
+    /**
+     * The musical section the member belongs to. Mandatory.
+     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "section")
-    private SectionEnum section;
+    @Column(name = "section", nullable = false)
+    private SectionEnum section; //
 
-    //--------------------------------| Optional Fields |----------------------------------------
-    private String notes;
+    // --------------------------------| Optional Fields |----------------------------------------
+    /**
+     * Internal notes about the member. Optional.
+     */
+    @Column(name = "notes", length = 2000)
+    private String notes; //
+
+    /**
+     * The member's date of birth. Optional and sensitive.
+     */
     @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
-    private String phoneNumber;
-    private String number;
-    private String street;
-    private String zipCode;
-    private String city;
-    private String country;
-    //-------------------------------------------------------------------------------------------
+    private LocalDate dateOfBirth; //
+
+    /**
+     * The member's phone number. Optional and sensitive.
+     */
+    @Column(name = "phone_number", length = 30)
+    private String phoneNumber; //
+
+    /**
+     * The member's physical address, stored as an embedded component.
+     */
+    @Embedded
+    private Address address;
 }
