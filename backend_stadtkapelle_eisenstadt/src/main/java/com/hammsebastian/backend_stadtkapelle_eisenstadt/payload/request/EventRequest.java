@@ -10,11 +10,13 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.EventType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Setter
+@Getter
 @Builder
 public class EventRequest {
 

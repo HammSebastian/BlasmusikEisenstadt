@@ -7,7 +7,7 @@
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.NewEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.NewsEntity;
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,14 +24,14 @@ public class NewsResponse {
     private LocalDate date;
     private boolean isPublished;
 
-    public static NewsResponse toNewsResponse(NewEntity newEntity) {
+    public static NewsResponse toNewsResponse(NewsEntity newsEntity) {
         return NewsResponse.builder()
-                .title(newEntity.getTitle())
-                .description(newEntity.getDescription())
-                .newsImage(newEntity.getNewsImage())
-                .newsType(newEntity.getNewsType().toString())
-                .date(newEntity.getDate())
-                .isPublished(newEntity.isPublished())
+                .title(newsEntity.getTitle())
+                .description(newsEntity.getDescription())
+                .newsImage(newsEntity.getNewsImage())
+                .newsType(newsEntity.getNewsType().toString())
+                .date(newsEntity.getDate())
+                .isPublished(newsEntity.isPublished())
                 .build();
     }
 }

@@ -15,13 +15,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -42,48 +42,29 @@ public class WebSecurityConfiguration {
     @Value("${auth0.audience}")
     private String auth0Audience;
 
+    private static final String[] PUBLIC_MATCHERS = {
+            "/about/**",
+            "/events/**",
+            "/gallery/**",
+            "/history/**",
+            "/images/**",
+            "/locations/**",
+            "/member/**",
+            "/news/**",
+            "/section/**",
+            "/welcome/**",
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.GET, "/welcomecontent", "/welcomecontent/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/welcomecontent", "/welcomecontent/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/welcomecontent", "/welcomecontent/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/about", "/about/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/about", "/about/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/about", "/about/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/events", "/events/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/events", "/events/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/events", "/events/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.DELETE, "/events", "/events/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/locations", "/locations/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/locations", "/locations/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/locations", "/locations/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.DELETE, "/locations", "/locations/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/news", "/news/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/news", "/news/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/news", "/news/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.DELETE, "/news", "/news/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/history", "/history/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/history", "/history/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/history", "/history/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/gallery", "/gallery/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.DELETE, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
-
-                        .requestMatchers(HttpMethod.GET, "/images", "/images/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.PUT, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
-                        .requestMatchers(HttpMethod.DELETE, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS).hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.PUT, PUBLIC_MATCHERS).hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.DELETE, PUBLIC_MATCHERS).hasAnyAuthority("write:admin", "write:reporter")
 
                         .requestMatchers("/images/**").permitAll()
                         .anyRequest().authenticated()

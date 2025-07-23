@@ -98,7 +98,7 @@ public class DataInitializer implements CommandLineRunner {
         // News
         if (newsRepository.count() == 0) {
             for (int i = 1; i <= 5; i++) {
-                NewEntity news = NewEntity.builder()
+                NewsEntity news = NewsEntity.builder()
                         .title("Neuigkeit " + i)
                         .description("Spannende Information Nummer " + i)
                         .newsImage("assets/images/Hero-Image.jpeg")

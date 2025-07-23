@@ -28,26 +28,26 @@ public class AboutController {
     @GetMapping
     public ResponseEntity<ApiResponse<AboutResponse>> getAbout() {
         ApiResponse<AboutResponse> response = aboutService.getAbout();
-        if (response.getData() == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.<AboutResponse>builder()
-                    .message("About not found")
-                    .statusCode(404)
-                    .build());
-        }
-        return ResponseEntity.ok(response);
+
+        return response.getData() == null ? ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.<AboutResponse>builder()
+                        .message("About not found")
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .build())
+                : ResponseEntity.ok(response);
     }
 
     @PutMapping
     @PreAuthorize("hasAnyAuthority('write:admin', 'write:reporter')")
-    public ResponseEntity<ApiResponse<AboutResponse>> saveAbout(@RequestBody AboutRequest aboutRequest) {
+    public ResponseEntity<ApiResponse<AboutResponse>> updateAbout(@RequestBody AboutRequest aboutRequest) {
         ApiResponse<AboutResponse> response = aboutService.saveAbout(aboutRequest);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/upload-image")
+    @PostMapping("/image")
     @PreAuthorize("hasAnyAuthority('write:admin', 'write:reporter')")
     public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("file") MultipartFile file) {
-        ApiResponse<String> reponse = aboutService.uploadImage(file);
-        return ResponseEntity.ok(reponse);
+        ApiResponse<String> response = aboutService.uploadImage(file);
+        return ResponseEntity.ok(response);
     }
 }

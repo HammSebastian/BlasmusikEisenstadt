@@ -11,7 +11,7 @@ import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
+@Setter
 @Builder
 public class WelcomeContentRequest {
 
