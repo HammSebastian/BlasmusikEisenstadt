@@ -7,7 +7,7 @@
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.service.impl;
 
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.NewsEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.NewEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request.NewsRequest;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.ApiResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.NewsResponse;
@@ -37,7 +37,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public ApiResponse<NewsResponse> getNew(Long id) {
-        Optional<NewsEntity> newsEntity = newsRepository.findById(id);
+        Optional<NewEntity> newsEntity = newsRepository.findById(id);
         if (newsEntity.isPresent()) {
             return ApiResponse.<NewsResponse>builder()
                     .message("News retrieved successfully")
@@ -54,10 +54,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public ApiResponse<NewsResponse> saveNews(NewsRequest newsRequest) {
-        Optional<NewsEntity> existingNews = newsRepository.findNewsEntityByTitleAndDescription(newsRequest.getTitle(), newsRequest.getDescription());
+        Optional<NewEntity> existingNews = newsRepository.findNewsEntityByTitleAndDescription(newsRequest.getTitle(), newsRequest.getDescription());
 
         if (existingNews.isEmpty()) {
-            NewsEntity newsEntity = NewsEntity.builder()
+            NewEntity newEntity = NewEntity.builder()
                     .title(newsRequest.getTitle())
                     .description(newsRequest.getDescription())
                     .newsImage(newsRequest.getNewsImage())
@@ -66,7 +66,7 @@ public class NewsServiceImpl implements NewsService {
                     .isPublished(newsRequest.isPublished())
                     .build();
 
-            NewsEntity savedNews = newsRepository.save(newsEntity);
+            NewEntity savedNews = newsRepository.save(newEntity);
             return ApiResponse.<NewsResponse>builder()
                     .message("News saved successfully")
                     .statusCode(201)
@@ -82,7 +82,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public ApiResponse<NewsResponse> updateNews(Long id, NewsRequest newsRequest) {
-        Optional<NewsEntity> existingNews = newsRepository.findById(id);
+        Optional<NewEntity> existingNews = newsRepository.findById(id);
         if (existingNews.isEmpty()) {
             return ApiResponse.<NewsResponse>builder()
                     .message("News not found")
@@ -90,20 +90,20 @@ public class NewsServiceImpl implements NewsService {
                     .build();
         }
 
-        NewsEntity newsEntity = existingNews.get();
-        newsEntity.setTitle(newsRequest.getTitle());
-        newsEntity.setDescription(newsRequest.getDescription());
-        newsEntity.setNewsImage(newsRequest.getNewsImage());
-        newsEntity.setNewsType(newsRequest.getNewsType());
-        newsEntity.setDate(newsRequest.getDate());
-        newsEntity.setPublished(newsRequest.isPublished());
+        NewEntity newEntity = existingNews.get();
+        newEntity.setTitle(newsRequest.getTitle());
+        newEntity.setDescription(newsRequest.getDescription());
+        newEntity.setNewsImage(newsRequest.getNewsImage());
+        newEntity.setNewsType(newsRequest.getNewsType());
+        newEntity.setDate(newsRequest.getDate());
+        newEntity.setPublished(newsRequest.isPublished());
 
-        newsRepository.save(newsEntity);
+        newsRepository.save(newEntity);
 
         return ApiResponse.<NewsResponse>builder()
                 .message("News updated successfully")
                 .statusCode(200)
-                .data(NewsResponse.toNewsResponse(newsEntity))
+                .data(NewsResponse.toNewsResponse(newEntity))
                 .build();
     }
 
@@ -177,7 +177,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public ApiResponse<List<NewsResponse>> getAllNews() {
-        List<NewsEntity> newsEntities = newsRepository.findAll();
+        List<NewEntity> newsEntities = newsRepository.findAll();
         List<NewsResponse> newsResponses = newsEntities.stream()
                 .map(NewsResponse::toNewsResponse)
                 .collect(Collectors.toList());

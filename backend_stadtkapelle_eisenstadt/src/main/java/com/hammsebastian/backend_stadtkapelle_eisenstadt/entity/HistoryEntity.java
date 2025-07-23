@@ -8,10 +8,7 @@
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -19,7 +16,8 @@ import java.util.List;
 @Table(name = "history")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class HistoryEntity {
 
@@ -29,6 +27,7 @@ public class HistoryEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "history", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SectionsEntity> sections;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "sections_id")
+    private List<SectionEntity> sections;
 }

@@ -9,7 +9,7 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.service.impl;
 
 
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.HistoryEntity;
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionsEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request.HistoryRequest;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.ApiResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.HistoryResponse;
@@ -18,6 +18,7 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.repository.SectionRepos
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.service.HistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -29,6 +30,7 @@ public class HistoryServiceImpl implements HistoryService {
     private final SectionRepository sectionRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ApiResponse<HistoryResponse> getHistory() {
         Optional<HistoryEntity> historyEntity = historyRepository.findById(1L);
 
@@ -48,7 +50,7 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public ApiResponse<HistoryResponse> saveHistory(HistoryRequest historyRequest) {
         Optional<HistoryEntity> historyEntity = historyRepository.findById(1L);
-        Optional<SectionsEntity> sectionEntity = sectionRepository.findById(1L);
+        Optional<SectionEntity> sectionEntity = sectionRepository.findById(1L);
 
         if (sectionEntity.isEmpty()) {
             return ApiResponse.<HistoryResponse>builder()

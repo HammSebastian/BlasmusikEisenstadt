@@ -19,6 +19,7 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.repository.LocationRepo
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +42,7 @@ public class EventServiceImpl implements EventService {
     private final LocationRepository locationRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public ApiResponse<EventResponse> getEvent(Long id) {
         Optional<EventEntity> event = eventRepository.findById(id);
 
@@ -225,6 +227,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ApiResponse<List<EventResponse>> getAllEvents() {
         List<EventEntity> eventEntities = eventRepository.findAll();
         List<EventResponse> eventResponses = eventEntities.stream()

@@ -3,32 +3,34 @@
  *
  * @author Sebastian Hamm
  * @version 1.0.0
- * @since 7/22/25
+ * @since 7/23/25
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "sections")
+@Table(name = "images")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
-public class SectionsEntity {
+public class ImageEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int year;
-    private String description;
+    private String imageUrl;
+    private String author;
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "history_id")
-    private HistoryEntity history;
+    @JoinColumn(name = "gallery_id")
+    private GalleryEntity gallery;
+
 }

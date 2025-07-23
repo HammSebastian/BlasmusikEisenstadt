@@ -9,11 +9,9 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.service.impl;
 
 
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.AboutEntity;
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.WelcomeContentEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request.AboutRequest;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.AboutResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.ApiResponse;
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.WelcomeContentResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.repository.AboutRepository;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.service.AboutService;
 import lombok.RequiredArgsConstructor;

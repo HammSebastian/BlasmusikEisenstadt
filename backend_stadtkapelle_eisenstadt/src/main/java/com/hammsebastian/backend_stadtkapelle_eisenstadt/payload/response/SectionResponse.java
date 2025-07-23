@@ -7,7 +7,7 @@
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionsEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionEntity;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,7 +18,7 @@ public class SectionResponse {
     private int year;
     private String description;
 
-    public static SectionResponse toSectionResponse(SectionsEntity section) {
+    public static SectionResponse toSectionResponse(SectionEntity section) {
         return SectionResponse.builder()
                 .year(section.getYear())
                 .description(section.getDescription())

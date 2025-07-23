@@ -8,7 +8,7 @@
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.service.impl;
 
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionsEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request.SectionRequest;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.ApiResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.SectionResponse;
@@ -29,7 +29,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public ApiResponse<List<SectionResponse>> getAllSections() {
-        List<SectionsEntity> sections = sectionRepository.findAll();
+        List<SectionEntity> sections = sectionRepository.findAll();
         List<SectionResponse> sectionResponses = sections.stream()
                 .map(SectionResponse::toSectionResponse)
                 .collect(Collectors.toList());
@@ -43,7 +43,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public ApiResponse<SectionResponse> getSectionById(Long id) {
-        Optional<SectionsEntity> section = sectionRepository.findById(id);
+        Optional<SectionEntity> section = sectionRepository.findById(id);
 
         if (section.isEmpty()) {
             return ApiResponse.<SectionResponse>builder()
@@ -69,7 +69,7 @@ public class SectionServiceImpl implements SectionService {
                     .build();
         }
 
-        SectionsEntity section = new SectionsEntity();
+        SectionEntity section = new SectionEntity();
         section.setYear(sectionRequest.getYear());
         section.setDescription(sectionRequest.getDescription());
         sectionRepository.save(section);
@@ -88,7 +88,7 @@ public class SectionServiceImpl implements SectionService {
                     .statusCode(404)
                     .build();
         } else {
-            SectionsEntity section = sectionRepository.findById(id).get();
+            SectionEntity section = sectionRepository.findById(id).get();
             section.setYear(sectionRequest.getYear());
             section.setDescription(sectionRequest.getDescription());
             sectionRepository.save(section);
@@ -118,7 +118,7 @@ public class SectionServiceImpl implements SectionService {
 
     @Override
     public ApiResponse<List<SectionResponse>> getSectionsByYear(int year) {
-        List<SectionsEntity> sections = sectionRepository.findByYear(year);
+        List<SectionEntity> sections = sectionRepository.findByYear(year);
         List<SectionResponse> sectionResponses = sections.stream()
                 .map(SectionResponse::toSectionResponse)
                 .collect(Collectors.toList());

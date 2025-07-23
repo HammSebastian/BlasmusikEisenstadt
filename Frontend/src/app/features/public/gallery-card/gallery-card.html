@@ -1,0 +1,38 @@
+<section class="py-16 min-h-screen bg-gradient-to-br">
+
+    <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12 text-blue-800">Fotos</h2>
+        <button
+            (click)="goBack()"
+            class="inline-block bg-blue-600 text-white hover:bg-blue-700 font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out transform hover:scale-105 mb-8 shadow-md hover:shadow-lg"
+        >
+            Zur&uuml;ck
+        </button>
+
+
+        @if (imageSectionLoading()) {
+            <app-loading></app-loading>
+        } @else if (!imageSectionLoading() && !imageSectionError()) {
+            <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-5">
+                @for (image of images(); track image.imageUrl) {
+                    <div class="rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <img
+                            [ngSrc]="image.imageUrl"
+                            width="400"
+                            height="300"
+                            alt="Gallery image"
+                            class="w-full h-64 object-cover"
+                            priority
+                        />
+                        <div class="p-4">
+                            <p class="text-sm text-gray-600">Foto von: {{ image.author }}</p>
+                            <p class="text-xs text-gray-500">{{ image.date | date}}</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <app-error-message [errorMessage]="imageSectionErrorMessage()"></app-error-message>
+        }
+    </div>
+</section>

@@ -3,32 +3,30 @@
  *
  * @author Sebastian Hamm
  * @version 1.0.0
- * @since 7/20/25
+ * @since 7/22/25
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
-
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "locations")
+@Table(name = "sections")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class LocationEntity {
+public class SectionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String country;
+    private int year;
+    private String description;
 
-    @Column(name = "zip_code")
-    private String zipCode;
-    private String city;
-    private String street;
-    private String number;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "history_id")
+    private HistoryEntity history;
 }

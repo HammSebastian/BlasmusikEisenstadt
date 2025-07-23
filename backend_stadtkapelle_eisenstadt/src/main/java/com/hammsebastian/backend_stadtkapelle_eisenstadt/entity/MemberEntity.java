@@ -11,10 +11,7 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.InstrumentEnum;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.SectionEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -22,7 +19,8 @@ import java.time.LocalDate;
 @Table(name = "members")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
 public class MemberEntity {
 

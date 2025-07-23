@@ -7,7 +7,7 @@
         } @else if (!loading() && !error()) {
             <div class="relative border-l-4 border-blue-600 mx-auto max-w-4xl">
 
-                @for (item of sectionsWithIndex() ?? []; track item.section.year) {
+                @for (item of sectionsWithIndex(); track item.section.year) {
                     <div
                         class="mb-10 ml-6 relative group opacity-0 translate-x-8 transition duration-700 ease-out"
                         [attr.data-index]="item.index"

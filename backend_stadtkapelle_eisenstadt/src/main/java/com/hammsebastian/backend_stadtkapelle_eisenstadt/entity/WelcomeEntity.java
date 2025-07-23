@@ -8,18 +8,16 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "welcome_content")
+@Table(name = "welcome")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
-public class WelcomeContentEntity {
+public class WelcomeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

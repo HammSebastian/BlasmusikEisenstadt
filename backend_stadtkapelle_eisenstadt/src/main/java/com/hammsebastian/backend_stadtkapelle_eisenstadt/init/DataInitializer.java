@@ -36,13 +36,15 @@ public class DataInitializer implements CommandLineRunner {
     private final HistoryRepository historyRepository;
     private final SectionRepository sectionRepository;
     private final MemberRepository memberRepository;
+    private final GalleryRepository galleryRepository;
+    private final ImageRepository imageRepository;
 
     @Override
     public void run(String... args) {
 
         // WelcomeContent
         if (welcomeContentRepository.count() == 0) {
-            WelcomeContentEntity welcome = WelcomeContentEntity.builder()
+            WelcomeEntity welcome = WelcomeEntity.builder()
                     .title("Stadtkapelle Eisenstadt")
                     .subTitle("Tradition seit 1874")
                     .buttonText("Unsere nächsten Auftritte")
@@ -96,7 +98,7 @@ public class DataInitializer implements CommandLineRunner {
         // News
         if (newsRepository.count() == 0) {
             for (int i = 1; i <= 5; i++) {
-                NewsEntity news = NewsEntity.builder()
+                NewEntity news = NewEntity.builder()
                         .title("Neuigkeit " + i)
                         .description("Spannende Information Nummer " + i)
                         .newsImage("assets/images/Hero-Image.jpeg")
@@ -118,7 +120,7 @@ public class DataInitializer implements CommandLineRunner {
             history = historyRepository.save(history);
 
             for (int i = 0; i < 5; i++) {
-                SectionsEntity section = SectionsEntity.builder()
+                SectionEntity section = SectionEntity.builder()
                         .year(1874 + (i * 30))
                         .description("Historischer Meilenstein im Jahr " + (1874 + (i * 30)))
                         .history(history)
@@ -151,6 +153,59 @@ public class DataInitializer implements CommandLineRunner {
             );
             memberRepository.saveAll(members);
             log.info("5 Members saved");
+        }
+
+        // Gallery
+        if (galleryRepository.count() == 0) {
+            // First, create the GalleryEntity objects (without saving them yet)
+            GalleryEntity gallery1 = GalleryEntity.builder()
+                    .title("Stadtkapelle Eisenstadt")
+                    .fromDate(LocalDate.now())
+                    .images(List.of())
+                    .build();
+            
+            GalleryEntity gallery2 = GalleryEntity.builder()
+                    .title("Stadtkapelle Eisenstadt1")
+                    .fromDate(LocalDate.now())
+                    .images(List.of())
+                    .build();
+            
+            GalleryEntity gallery3 = GalleryEntity.builder()
+                    .title("Stadtkapelle Eisenstadt2")
+                    .fromDate(LocalDate.now())
+                    .images(List.of())
+                    .build();
+            
+            // Create the ImageEntity objects and set their gallery field
+            ImageEntity image1 = ImageEntity.builder()
+                    .imageUrl("assets/images/Hero-Image.jpeg")
+                    .author("Sebastian Hamm")
+                    .date(LocalDate.now())
+                    .gallery(gallery1)
+                    .build();
+            
+            ImageEntity image2 = ImageEntity.builder()
+                    .imageUrl("assets/images/Hero-Image.jpeg")
+                    .author("Sebastian Hamm1")
+                    .date(LocalDate.now())
+                    .gallery(gallery2)
+                    .build();
+            
+            ImageEntity image3 = ImageEntity.builder()
+                    .imageUrl("assets/images/Hero-Image.jpeg")
+                    .author("Sebastian Hamm2")
+                    .date(LocalDate.now())
+                    .gallery(gallery3)
+                    .build();
+            
+            // Set the images list for each gallery
+            gallery1.setImages(List.of(image1));
+            gallery2.setImages(List.of(image2));
+            gallery3.setImages(List.of(image3));
+            
+            // Save the galleries, which will cascade the save operation to the images
+            galleryRepository.saveAll(List.of(gallery1, gallery2, gallery3));
+            log.info("3 Galleries with images saved");
         }
     }
 }

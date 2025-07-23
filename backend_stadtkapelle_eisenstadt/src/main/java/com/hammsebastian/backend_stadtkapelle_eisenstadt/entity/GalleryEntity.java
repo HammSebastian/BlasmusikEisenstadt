@@ -3,32 +3,36 @@
  *
  * @author Sebastian Hamm
  * @version 1.0.0
- * @since 7/20/25
+ * @since 7/23/25
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
-
 
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Entity
-@Table(name = "locations")
+@Table(name = "gallery")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class LocationEntity {
+public class GalleryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String country;
+    @Column(unique = true)
+    private String title;
 
-    @Column(name = "zip_code")
-    private String zipCode;
-    private String city;
-    private String street;
-    private String number;
+    private LocalDate fromDate;
+
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "gallery_id")
+    private List<ImageEntity> images;
 }

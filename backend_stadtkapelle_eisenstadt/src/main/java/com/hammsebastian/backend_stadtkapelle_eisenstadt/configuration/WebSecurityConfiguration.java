@@ -75,6 +75,16 @@ public class WebSecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/history", "/history/**").hasAnyAuthority("write:admin", "write:reporter")
                         .requestMatchers(HttpMethod.PUT, "/history", "/history/**").hasAnyAuthority("write:admin", "write:reporter")
 
+                        .requestMatchers(HttpMethod.GET, "/gallery", "/gallery/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.PUT, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.DELETE, "/gallery", "/gallery/**").hasAnyAuthority("write:admin", "write:reporter")
+
+                        .requestMatchers(HttpMethod.GET, "/images", "/images/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.PUT, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
+                        .requestMatchers(HttpMethod.DELETE, "/images", "/images/**").hasAnyAuthority("write:admin", "write:reporter")
+
                         .requestMatchers("/images/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -10,6 +10,8 @@ import {environment} from '../../../environments/environment';
 import {NewsModel} from '../models/news.model';
 import {HistoryModel} from '../models/history.model';
 import {MembersModel} from '../models/members.model';
+import {GalleryModel} from '../models/gallery.model';
+import {ImageModel} from '../models/image.model';
 
 @Injectable({
   providedIn: 'root'
@@ -129,6 +131,17 @@ export class DataService {
     }
 
     //-------------------------------------| Members |-------------------------------------
+
+    //-------------------------------------| Gallery |-------------------------------------
+    public loadGallery(): Observable<ApiResponse<GalleryModel[]>> {
+        return this.http.get<ApiResponse<GalleryModel[]>>(`${this.environment}/gallery`);
+    }
+
+    loadGalleryImagesByTitle(title: string): Observable<ApiResponse<ImageModel[]>> {
+        return this.http.get<ApiResponse<ImageModel[]>>(`${this.environment}/images/${title}`);
+    }
+
+    //-------------------------------------| Gallery |-------------------------------------
 
 
 

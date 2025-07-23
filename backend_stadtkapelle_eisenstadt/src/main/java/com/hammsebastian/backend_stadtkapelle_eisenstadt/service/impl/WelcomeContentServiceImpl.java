@@ -6,7 +6,7 @@
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.service.impl;
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.WelcomeContentEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.WelcomeEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request.WelcomeContentRequest;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.ApiResponse;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.WelcomeContentResponse;
@@ -34,7 +34,7 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
 
     @Override
     public ApiResponse<WelcomeContentResponse> getSiteContent() {
-        Optional<WelcomeContentEntity> siteContentOptional = welcomeContentRepository.findById(1L);
+        Optional<WelcomeEntity> siteContentOptional = welcomeContentRepository.findById(1L);
 
         if (siteContentOptional.isEmpty()) {
             return ApiResponse.<WelcomeContentResponse>builder()
@@ -43,12 +43,12 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
                     .build();
         }
 
-        WelcomeContentEntity welcomeContentEntity = siteContentOptional.get();
+        WelcomeEntity welcomeEntity = siteContentOptional.get();
         WelcomeContentResponse welcomeContentResponse = WelcomeContentResponse.builder()
-                .title(welcomeContentEntity.getTitle())
-                .subTitle(welcomeContentEntity.getSubTitle())
-                .buttonText(welcomeContentEntity.getButtonText())
-                .backgroundImage(welcomeContentEntity.getBackgroundImage())
+                .title(welcomeEntity.getTitle())
+                .subTitle(welcomeEntity.getSubTitle())
+                .buttonText(welcomeEntity.getButtonText())
+                .backgroundImage(welcomeEntity.getBackgroundImage())
                 .build();
         return ApiResponse.<WelcomeContentResponse>builder()
                 .message("SiteContent found")
@@ -59,31 +59,31 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
 
     @Override
     public ApiResponse<WelcomeContentResponse> saveSiteContent(WelcomeContentRequest welcomeContentRequest) {
-        Optional<WelcomeContentEntity> existingContentOptional = welcomeContentRepository.findById(1L);
-        WelcomeContentEntity welcomeContentEntity;
+        Optional<WelcomeEntity> existingContentOptional = welcomeContentRepository.findById(1L);
+        WelcomeEntity welcomeEntity;
 
         if (existingContentOptional.isPresent()) {
-            welcomeContentEntity = existingContentOptional.get();
+            welcomeEntity = existingContentOptional.get();
         } else {
-            welcomeContentEntity = new WelcomeContentEntity();
-            welcomeContentEntity.setId(1L);
+            welcomeEntity = new WelcomeEntity();
+            welcomeEntity.setId(1L);
         }
 
-        welcomeContentEntity.setTitle(welcomeContentRequest.getTitle());
-        welcomeContentEntity.setSubTitle(welcomeContentRequest.getSubTitle());
-        welcomeContentEntity.setButtonText(welcomeContentRequest.getButtonText());
-        welcomeContentEntity.setBackgroundImage(welcomeContentRequest.getBackgroundImage());
+        welcomeEntity.setTitle(welcomeContentRequest.getTitle());
+        welcomeEntity.setSubTitle(welcomeContentRequest.getSubTitle());
+        welcomeEntity.setButtonText(welcomeContentRequest.getButtonText());
+        welcomeEntity.setBackgroundImage(welcomeContentRequest.getBackgroundImage());
 
-        welcomeContentRepository.save(welcomeContentEntity);
+        welcomeContentRepository.save(welcomeEntity);
 
         return ApiResponse.<WelcomeContentResponse>builder()
                 .message("SiteContent saved/updated successfully")
                 .statusCode(200)
                 .data(WelcomeContentResponse.builder()
-                        .title(welcomeContentEntity.getTitle())
-                        .subTitle(welcomeContentEntity.getSubTitle())
-                        .buttonText(welcomeContentEntity.getButtonText())
-                        .backgroundImage(welcomeContentEntity.getBackgroundImage())
+                        .title(welcomeEntity.getTitle())
+                        .subTitle(welcomeEntity.getSubTitle())
+                        .buttonText(welcomeEntity.getButtonText())
+                        .backgroundImage(welcomeEntity.getBackgroundImage())
                         .build())
                 .build();
     }

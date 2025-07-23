@@ -6,10 +6,10 @@
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.repository;
 
-import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.WelcomeContentEntity;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.WelcomeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WelcomeContentRepository extends JpaRepository<WelcomeContentEntity, Long> {
+public interface WelcomeContentRepository extends JpaRepository<WelcomeEntity, Long> {
 }

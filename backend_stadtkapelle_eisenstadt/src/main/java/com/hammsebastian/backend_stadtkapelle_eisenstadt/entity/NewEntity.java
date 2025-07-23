@@ -9,10 +9,7 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.NewsType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -22,9 +19,10 @@ import java.time.LocalDateTime;
 @Table(name = "news")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Builder
-public class NewsEntity {
+public class NewEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
