@@ -10,8 +10,11 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.SectionEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class SectionResponse {
 

@@ -14,20 +14,17 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-// import java.util.Set; // Uncomment if using the bidirectional @OneToMany relationship
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "locations")
+@EntityListeners(AuditingEntityListener.class)
 public class LocationEntity {
 
     /**

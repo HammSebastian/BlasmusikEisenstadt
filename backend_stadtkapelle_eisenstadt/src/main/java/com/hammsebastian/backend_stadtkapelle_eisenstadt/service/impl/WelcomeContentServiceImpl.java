@@ -46,9 +46,9 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
         WelcomeEntity welcomeEntity = siteContentOptional.get();
         WelcomeContentResponse welcomeContentResponse = WelcomeContentResponse.builder()
                 .title(welcomeEntity.getTitle())
-                .subTitle(welcomeEntity.getSubTitle())
+                .subTitle(welcomeEntity.getSubtitle())
                 .buttonText(welcomeEntity.getButtonText())
-                .backgroundImage(welcomeEntity.getBackgroundImage())
+                .backgroundImage(welcomeEntity.getBackgroundImageUrl())
                 .build();
         return ApiResponse.<WelcomeContentResponse>builder()
                 .message("SiteContent found")
@@ -70,9 +70,9 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
         }
 
         welcomeEntity.setTitle(welcomeContentRequest.getTitle());
-        welcomeEntity.setSubTitle(welcomeContentRequest.getSubTitle());
+        welcomeEntity.setSubtitle(welcomeContentRequest.getSubTitle());
         welcomeEntity.setButtonText(welcomeContentRequest.getButtonText());
-        welcomeEntity.setBackgroundImage(welcomeContentRequest.getBackgroundImage());
+        welcomeEntity.setBackgroundImageUrl(welcomeContentRequest.getBackgroundImage());
 
         welcomeContentRepository.save(welcomeEntity);
 
@@ -81,9 +81,9 @@ public class WelcomeContentServiceImpl implements WelcomeContentService {
                 .statusCode(200)
                 .data(WelcomeContentResponse.builder()
                         .title(welcomeEntity.getTitle())
-                        .subTitle(welcomeEntity.getSubTitle())
+                        .subTitle(welcomeEntity.getSubtitle())
                         .buttonText(welcomeEntity.getButtonText())
-                        .backgroundImage(welcomeEntity.getBackgroundImage())
+                        .backgroundImage(welcomeEntity.getBackgroundImageUrl())
                         .build())
                 .build();
     }

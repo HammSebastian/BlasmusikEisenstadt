@@ -38,15 +38,15 @@ export class GalleryCard implements OnInit {
     }
 
     loadGalleryFromTitle() {
-        const title = this.route.snapshot.paramMap.get('title');
-        if (!title) {
+        const slug = this.route.snapshot.paramMap.get('slug');
+        if (!slug) {
             this.imageSectionError.set(true);
             this.imageSectionLoading.set(false);
             this.imageSectionErrorMessage.set('Gallery title not found');
             return;
         }
 
-        this.dataService.loadGalleryImagesByTitle(title).subscribe({
+        this.dataService.loadGalleryImagesBySlug(slug).subscribe({
             next: (response) => {
                 this.images.set(response.data);
                 this.imageSectionLoading.set(false);
@@ -60,7 +60,10 @@ export class GalleryCard implements OnInit {
         })
     }
 
+    /**
+     * Navigates back to the gallery overview page
+     */
     goBack() {
-        window.history.back();
+        this.router.navigate(['/gallery']);
     }
 }

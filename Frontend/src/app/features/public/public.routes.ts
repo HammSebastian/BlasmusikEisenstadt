@@ -32,7 +32,7 @@ export const PublicRoutes: Routes = [
         title: 'Galerie'
     },
     {
-        path: 'gallery/:title',
+        path: 'gallery/:slug',
         loadComponent: () => import('./gallery-card/gallery-card').then(m => m.GalleryCard),
         title: 'Galerie'
     },

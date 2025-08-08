@@ -60,10 +60,9 @@ public class HistoryServiceImpl implements HistoryService {
         }
 
         if (historyEntity.isEmpty()) {
-            HistoryEntity history = HistoryEntity.builder()
-                    .name(historyRequest.getName())
-                    .sections(sectionEntity.get().getHistory().getSections())
-                    .build();
+            HistoryEntity history = new HistoryEntity();
+            history.setName(historyRequest.getName());
+            history.setSections(sectionEntity.get().getHistory().getSections());
             historyRepository.save(history);
 
             return ApiResponse.<HistoryResponse>builder()

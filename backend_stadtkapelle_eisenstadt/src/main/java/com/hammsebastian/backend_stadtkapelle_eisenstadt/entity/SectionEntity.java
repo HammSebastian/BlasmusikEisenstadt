@@ -11,20 +11,22 @@
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "history") // Exclude parent relationship to prevent recursion
+@AllArgsConstructor
+@ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
-@Table(name = "sections")
+@Table(name = "news")
+@EntityListeners(AuditingEntityListener.class)
 public class SectionEntity {
 
     /**
@@ -37,18 +39,23 @@ public class SectionEntity {
     /**
      * The year associated with this historical section. Mandatory.
      */
+    @NotNull(message = "Year must not be null")
+    @Min(value = 1800, message = "Year must be at least 1800")
     @Column(name = "year", nullable = false)
     private int year;
 
     /**
      * The descriptive text for this section. Mandatory and supports long text.
      */
+    @NotBlank(message = "Description must not be blank")
+    @Size(min = 10, message = "Description must be at least 10 characters")
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
     /**
      * A reference to the parent HistoryEntity this section belongs to.
      */
+    @NotNull(message = "History must not be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "history_id", nullable = false)
     private HistoryEntity history;

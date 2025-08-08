@@ -8,6 +8,7 @@
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request;
 
 
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.embeddable.Address;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.InstrumentEnum;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.SectionEnum;
 import jakarta.persistence.Column;
@@ -17,10 +18,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class MemberRequest {
 
@@ -46,10 +50,6 @@ public class MemberRequest {
     private String notes;
     private LocalDate dateOfBirth;
     private String phoneNumber;
-    private String number;
-    private String street;
-    private String zipCode;
-    private String city;
-    private String country;
+    private Address address;
     //-------------------------------------------------------------------------------------------
 }

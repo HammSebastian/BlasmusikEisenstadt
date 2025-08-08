@@ -57,15 +57,13 @@ public class NewsServiceImpl implements NewsService {
         Optional<NewsEntity> existingNews = newsRepository.findNewsEntityByTitleAndDescription(newsRequest.getTitle(), newsRequest.getDescription());
 
         if (existingNews.isEmpty()) {
-            NewsEntity newsEntity = NewsEntity.builder()
-                    .title(newsRequest.getTitle())
-                    .description(newsRequest.getDescription())
-                    .newsImage(newsRequest.getNewsImage())
-                    .newsType(newsRequest.getNewsType())
-                    .date(newsRequest.getDate())
-                    .isPublished(newsRequest.isPublished())
-                    .build();
-
+            NewsEntity newsEntity = new NewsEntity();
+            newsEntity.setTitle(newsRequest.getTitle());
+            newsEntity.setDescription(newsRequest.getDescription());
+            newsEntity.setNewsImageUrl(newsRequest.getNewsImage());
+            newsEntity.setNewsType(newsRequest.getNewsType());
+            newsEntity.setDate(newsRequest.getDate());
+            newsEntity.setPublished(newsRequest.isPublished());
             NewsEntity savedNews = newsRepository.save(newsEntity);
             return ApiResponse.<NewsResponse>builder()
                     .message("News saved successfully")
@@ -93,7 +91,7 @@ public class NewsServiceImpl implements NewsService {
         NewsEntity newsEntity = existingNews.get();
         newsEntity.setTitle(newsRequest.getTitle());
         newsEntity.setDescription(newsRequest.getDescription());
-        newsEntity.setNewsImage(newsRequest.getNewsImage());
+        newsEntity.setNewsImageUrl(newsRequest.getNewsImage());
         newsEntity.setNewsType(newsRequest.getNewsType());
         newsEntity.setDate(newsRequest.getDate());
         newsEntity.setPublished(newsRequest.isPublished());

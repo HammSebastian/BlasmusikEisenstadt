@@ -8,8 +8,11 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class WelcomeContentResponse {
     private String title;

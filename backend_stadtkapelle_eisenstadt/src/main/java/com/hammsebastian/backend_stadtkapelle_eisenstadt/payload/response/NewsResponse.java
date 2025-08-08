@@ -10,10 +10,13 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.NewsEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class NewsResponse {
 
@@ -28,7 +31,7 @@ public class NewsResponse {
         return NewsResponse.builder()
                 .title(newsEntity.getTitle())
                 .description(newsEntity.getDescription())
-                .newsImage(newsEntity.getNewsImage())
+                .newsImage(newsEntity.getNewsImageUrl())
                 .newsType(newsEntity.getNewsType().toString())
                 .date(newsEntity.getDate())
                 .isPublished(newsEntity.isPublished())

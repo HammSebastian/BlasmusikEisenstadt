@@ -9,8 +9,10 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request;
 
 import jakarta.persistence.Column;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
 @Setter
 @Builder
 public class WelcomeContentRequest {

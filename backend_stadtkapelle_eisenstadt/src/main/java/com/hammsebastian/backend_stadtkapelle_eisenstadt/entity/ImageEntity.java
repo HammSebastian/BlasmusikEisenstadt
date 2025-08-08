@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2025 Sebastian Hamm. All Rights Reserved.
- *
+ * <p>
  * Represents a single image, which is part of a gallery.
  *
  * @author Sebastian Hamm
@@ -11,20 +11,19 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDate;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "gallery") // Exclude parent relationship to prevent recursion
+@AllArgsConstructor
+@ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "images")
+@EntityListeners(AuditingEntityListener.class)
 public class ImageEntity {
 
     /**

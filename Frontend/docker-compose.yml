@@ -1,0 +1,9 @@
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # Externe Port 80 → interne nginx-Port 80
+    restart: unless-stopped

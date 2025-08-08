@@ -14,19 +14,17 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "welcome")
+@EntityListeners(AuditingEntityListener.class)
 public class WelcomeEntity {
 
     /**

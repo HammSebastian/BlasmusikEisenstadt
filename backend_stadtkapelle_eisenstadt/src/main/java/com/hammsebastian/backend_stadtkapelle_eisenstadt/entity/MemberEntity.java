@@ -14,20 +14,19 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.InstrumentEnum;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.SectionEnum;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDate;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"dateOfBirth", "phoneNumber", "address"}) // Exclude sensitive/complex fields
+@AllArgsConstructor
+@ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "members")
+@EntityListeners(AuditingEntityListener.class)
 public class MemberEntity {
 
     /**

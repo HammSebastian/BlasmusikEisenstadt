@@ -6,14 +6,18 @@
  */
 package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL) // null Felder nicht serialisieren
 public class ApiResponse<T> {
-    private String message;
-    private int statusCode;
-    private T data;
-    private String[] errors;
+
+    private final String message;
+    private final int statusCode;
+    private final T data;
+    private final String[] errors;
+
 }

@@ -10,10 +10,13 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.MemberEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class MemberResponse {
 
@@ -48,11 +51,11 @@ public class MemberResponse {
                 .notes(memberEntity.getNotes())
                 .dateOfBirth(memberEntity.getDateOfBirth())
                 .phoneNumber(memberEntity.getPhoneNumber())
-                .number(memberEntity.getNumber())
-                .street(memberEntity.getStreet())
-                .zipCode(memberEntity.getZipCode())
-                .city(memberEntity.getCity())
-                .country(memberEntity.getCountry())
+                .number(memberEntity.getAddress().getNumber())
+                .street(memberEntity.getAddress().getStreet())
+                .zipCode(memberEntity.getAddress().getZipCode())
+                .city(memberEntity.getAddress().getCity())
+                .country(memberEntity.getAddress().getCountry())
                 .build();
     }
 }

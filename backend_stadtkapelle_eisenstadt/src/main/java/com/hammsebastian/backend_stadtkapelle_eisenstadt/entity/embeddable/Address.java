@@ -10,8 +10,7 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.embeddable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * A reusable component representing a physical address.
@@ -20,6 +19,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Address {
 
     @Column(name = "street", length = 255)

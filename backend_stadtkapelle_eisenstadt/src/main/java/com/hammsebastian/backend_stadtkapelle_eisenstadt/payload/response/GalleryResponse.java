@@ -12,12 +12,15 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.GalleryEntity;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.ImageEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class GalleryResponse {
 
@@ -32,7 +35,7 @@ public class GalleryResponse {
                 
         return GalleryResponse.builder()
                 .title(galleryEntity.getTitle())
-                .fromDate(galleryEntity.getFromDate())
+                .fromDate(galleryEntity.getGalleryDate())
                 .images(imageUrls)
                 .build();
     }

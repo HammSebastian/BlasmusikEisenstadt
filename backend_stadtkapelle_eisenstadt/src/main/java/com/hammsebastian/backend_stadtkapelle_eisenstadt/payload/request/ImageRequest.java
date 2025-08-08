@@ -11,10 +11,13 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.request;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class ImageRequest {
 

@@ -11,11 +11,14 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.HistoryEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class HistoryResponse {
 

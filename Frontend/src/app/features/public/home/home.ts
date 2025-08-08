@@ -7,6 +7,7 @@ import {ErrorMessage} from '../../../shared/error-message/error-message';
 
 @Component({
     selector: 'app-home',
+    standalone: true,
     imports: [
         Loading,
         ErrorMessage
@@ -46,7 +47,7 @@ export class Home implements OnInit {
     ngOnInit() {
         this.loadWelcomeData();
         this.loadAboutData();
-        this.loadEvents();
+        //this.loadEvents();
         this.setSeoMetadata();
     }
 

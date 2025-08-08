@@ -51,7 +51,18 @@ export class Gallery implements OnInit {
 
 
     openGallery(imageTitle: string) {
-        console.log('Opening Gallery' + imageTitle);
-        this.router.navigate(['/gallery', imageTitle]);
+        const slug = this.toSlug(imageTitle);
+        console.log('Opening Gallery ' + slug);
+        this.router.navigate(['/gallery', slug]);
     }
+
+    private toSlug(input: string): string {
+        if (!input) return '';
+        return input.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')  // Sonderzeichen entfernen
+            .replace(/\s+/g, '-')          // Leerzeichen durch Bindestriche ersetzen
+            .replace(/-+/g, '-')           // Mehrfache Bindestriche reduzieren
+            .trim();
+    }
+
 }

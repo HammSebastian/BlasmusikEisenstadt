@@ -10,17 +10,20 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.entity.EventEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class EventResponse {
     private Long id;
     private String title;
     private String description;
     private LocalDate date;
-    private String eventImage;
+    private String eventImageUrl;
     private String eventType;
     private LocationResponse location;
 
@@ -30,7 +33,7 @@ public class EventResponse {
                 .title(eventEntity.getTitle())
                 .description(eventEntity.getDescription())
                 .date(eventEntity.getDate())
-                .eventImage(eventEntity.getEventImage())
+                .eventImageUrl(eventEntity.getEventImageUrl())
                 .eventType(eventEntity.getEventType().toString())
                 .location(LocationResponse.toLocationResponse(eventEntity.getLocation()))
                 .build();

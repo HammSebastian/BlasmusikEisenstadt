@@ -13,21 +13,20 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.NewsType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "news")
+@EntityListeners(AuditingEntityListener.class)
 public class NewsEntity { // Renamed from NewEntity
 
     /**

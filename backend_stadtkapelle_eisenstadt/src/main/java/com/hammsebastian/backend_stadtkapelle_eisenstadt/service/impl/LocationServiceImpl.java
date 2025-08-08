@@ -68,13 +68,13 @@ public class LocationServiceImpl implements LocationService {
         Optional<LocationEntity> location = locationRepository.getLocationEntityByCityAndZipCodeAndCountry(locationRequest.getCity(), locationRequest.getZipCode(), locationRequest.getCountry());
 
         if (location.isEmpty()) {
-            LocationEntity locationEntity = LocationEntity.builder()
-                    .country(locationRequest.getCountry())
-                    .zipCode(locationRequest.getZipCode())
-                    .city(locationRequest.getCity())
-                    .street(locationRequest.getStreet())
-                    .number(locationRequest.getNumber())
-                    .build();
+            LocationEntity locationEntity = new LocationEntity();
+            locationEntity.setCountry(locationRequest.getCountry());
+            locationEntity.setZipCode(locationRequest.getZipCode());
+            locationEntity.setCity(locationRequest.getCity());
+            locationEntity.setStreet(locationRequest.getStreet());
+            locationEntity.setNumber(locationRequest.getNumber());
+
             locationRepository.save(locationEntity);
             return ApiResponse.<LocationResponse>builder()
                     .message("Location saved")
@@ -186,7 +186,7 @@ public class LocationServiceImpl implements LocationService {
         List<LocationResponse> locationResponses = locationEntities.stream()
                 .map(LocationResponse::toLocationResponse)
                 .collect(Collectors.toList());
-        
+
         return ApiResponse.<List<LocationResponse>>builder()
                 .message("Locations retrieved successfully")
                 .statusCode(200)

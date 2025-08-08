@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Repository
 public interface GalleryRepository extends JpaRepository<GalleryEntity, Long> {
-    boolean findByTitleAndFromDate(String title, LocalDate fromDate);
+    boolean existsByTitleAndGalleryDate(String title, LocalDate galleryDate);
 
     Optional<GalleryEntity> findGalleryEntityByTitle(String title);
 }

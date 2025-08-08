@@ -17,211 +17,300 @@ import com.hammsebastian.backend_stadtkapelle_eisenstadt.payload.response.Locati
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.repository.EventRepository;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.repository.LocationRepository;
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.service.EventService;
+import com.hammsebastian.backend_stadtkapelle_eisenstadt.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional(readOnly = true)
     public ApiResponse<EventResponse> getEvent(Long id) {
-        Optional<EventEntity> event = eventRepository.findById(id);
-
-        if (event.isEmpty()) {
+        if (id == null) {
+            log.warn("Attempted to get event with null ID");
             return ApiResponse.<EventResponse>builder()
-                    .message("Event not found")
-                    .statusCode(404)
-                    .build();
-        }
-
-        EventEntity eventEntity = event.get();
-        EventResponse eventResponse = EventResponse.builder()
-                .title(eventEntity.getTitle())
-                .description(eventEntity.getDescription())
-                .date(eventEntity.getDate())
-                .eventImage(eventEntity.getEventImage())
-                .eventType(eventEntity.getEventType().toString())
-                .location(mapToLocationResponse(eventEntity.getLocation()))
-                .build();
-        return ApiResponse.<EventResponse>builder()
-                .message("Event found")
-                .statusCode(200)
-                .data(eventResponse)
-                .build();
-    }
-
-    @Override
-    public ApiResponse<EventResponse> saveEvent(EventRequest eventRequest) {
-        // Get location by ID instead of using the location entity directly
-        Long locationId = eventRequest.getLocationId();
-        if (locationId == null) {
-            return ApiResponse.<EventResponse>builder()
-                    .message("Location ID is required")
+                    .message("Event ID cannot be null")
                     .statusCode(400)
+                    .errors(new String[]{"Event ID is required"})
                     .build();
         }
-        
-        Optional<LocationEntity> location = locationRepository.findById(locationId);
-
-        if (location.isEmpty()) {
+        try {
+            Optional<EventEntity> eventOpt = eventRepository.findById(id);
+            if (eventOpt.isEmpty()) {
+                log.info("Event not found with ID: {}", id);
+                return ApiResponse.<EventResponse>builder()
+                        .message("Event not found")
+                        .statusCode(404)
+                        .errors(new String[]{"No event with ID " + id})
+                        .build();
+            }
+            EventEntity event = eventOpt.get();
+            EventResponse response = EventResponse.toEventResponse(event);
             return ApiResponse.<EventResponse>builder()
-                    .message("Location not found")
-                    .statusCode(404)
-                    .build();
-        }
-
-        Optional<EventEntity> event = eventRepository.findEventEntityByTitleAndLocation(eventRequest.getTitle(), location.get());
-
-        if (event.isEmpty()) {
-            EventEntity eventEntity = EventEntity.builder()
-                    .title(eventRequest.getTitle())
-                    .description(eventRequest.getDescription())
-                    .date(eventRequest.getDate())
-                    .eventImage(eventRequest.getEventImage())
-                    .eventType(eventRequest.getEventType())
-                    .location(location.get())
-                    .build();
-            EventEntity savedEvent = eventRepository.save(eventEntity);
-            
-            // Return the saved event in the response
-            EventResponse eventResponse = EventResponse.toEventResponse(savedEvent);
-            return ApiResponse.<EventResponse>builder()
-                    .message("Event saved")
-                    .statusCode(201)
-                    .data(eventResponse)
-                    .build();
-        } else {
-            return ApiResponse.<EventResponse>builder()
-                    .message("Event already exists")
-                    .statusCode(409)
-                    .build();
-        }
-    }
-
-    @Override
-    public ApiResponse<EventResponse> updateEvent(Long id, EventRequest eventRequest) {
-        Optional<EventEntity> event = eventRepository.findById(id);
-
-        if (event.isEmpty()) {
-            return ApiResponse.<EventResponse>builder()
-                    .message("Event not found")
-                    .statusCode(404)
-                    .build();
-        }
-
-        // Get location by ID
-        Optional<LocationEntity> location = locationRepository.findById(eventRequest.getLocationId());
-
-        if (location.isEmpty()) {
-            return ApiResponse.<EventResponse>builder()
-                    .message("Location not found")
-                    .statusCode(404)
-                    .build();
-        }
-
-        EventEntity eventEntity = event.get();
-
-        eventEntity.setTitle(eventRequest.getTitle());
-        eventEntity.setDescription(eventRequest.getDescription());
-        eventEntity.setDate(eventRequest.getDate());
-        eventEntity.setEventImage(eventRequest.getEventImage());
-        eventEntity.setEventType(eventRequest.getEventType());
-        eventEntity.setLocation(location.get());
-
-        EventEntity updatedEvent = eventRepository.save(eventEntity);
-        
-        // Return the updated event in the response
-        EventResponse eventResponse = EventResponse.toEventResponse(updatedEvent);
-        return ApiResponse.<EventResponse>builder()
-                .message("Event updated")
-                .statusCode(200)
-                .data(eventResponse)
-                .build();
-    }
-
-    @Override
-    public ApiResponse<String> deleteEvent(Long id) {
-        if (eventRepository.existsById(id)) {
-            eventRepository.deleteById(id);
-            return ApiResponse.<String>builder()
-                    .message("Event deleted")
+                    .message("Event found")
                     .statusCode(200)
+                    .data(response)
+                    .errors(null)
                     .build();
-        } else {
+        } catch (Exception e) {
+            log.error("Error retrieving event with ID: {}", id, e);
+            return ApiResponse.<EventResponse>builder()
+                    .message("Error retrieving event: " + e.getMessage())
+                    .statusCode(500)
+                    .errors(new String[]{e.getMessage()})
+                    .build();
+        }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<EventResponse> saveEvent(EventRequest eventRequest) {
+        if (eventRequest == null) {
+            log.warn("Attempted to save event with null request");
+            return ApiResponse.<EventResponse>builder()
+                    .message("Event request cannot be null")
+                    .statusCode(400)
+                    .errors(new String[]{"Event request is required"})
+                    .build();
+        }
+        try {
+            Long locationId = eventRequest.getLocationId();
+            if (locationId == null) {
+                log.warn("Attempted to save event with null location ID");
+                return ApiResponse.<EventResponse>builder()
+                        .message("Location ID is required")
+                        .statusCode(400)
+                        .errors(new String[]{"Location ID must be provided"})
+                        .build();
+            }
+            Optional<LocationEntity> locationOpt = locationRepository.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.info("Location not found with ID: {}", locationId);
+                return ApiResponse.<EventResponse>builder()
+                        .message("Location not found")
+                        .statusCode(404)
+                        .errors(new String[]{"No location with ID " + locationId})
+                        .build();
+            }
+            Optional<EventEntity> existing = eventRepository.findEventEntityByTitleAndLocation(eventRequest.getTitle(), locationOpt.get());
+            if (existing.isPresent()) {
+                log.info("Event already exists with title '{}' at location ID: {}", eventRequest.getTitle(), locationId);
+                return ApiResponse.<EventResponse>builder()
+                        .message("Event already exists")
+                        .statusCode(409)
+                        .errors(new String[]{"Event with same title and location already exists"})
+                        .build();
+            }
+            EventEntity eventEntity = new EventEntity();
+            eventEntity.setTitle(eventRequest.getTitle());
+            eventEntity.setDescription(eventRequest.getDescription());
+            eventEntity.setDate(eventRequest.getDate());
+            eventEntity.setEventImageUrl(eventRequest.getEventImageUrl());
+            eventEntity.setEventType(eventRequest.getEventType());
+            eventEntity.setLocation(locationOpt.get());
+            EventEntity saved = eventRepository.save(eventEntity);
+            log.info("Event saved successfully with ID: {}", saved.getId());
+            return ApiResponse.<EventResponse>builder()
+                    .message("Event saved successfully")
+                    .statusCode(201)
+                    .data(EventResponse.toEventResponse(saved))
+                    .errors(null)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error saving event", e);
+            return ApiResponse.<EventResponse>builder()
+                    .message("Error saving event: " + e.getMessage())
+                    .statusCode(500)
+                    .errors(new String[]{e.getMessage()})
+                    .build();
+        }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<EventResponse> updateEvent(Long id, EventRequest eventRequest) {
+        if (id == null) {
+            log.warn("Attempted to update event with null ID");
+            return ApiResponse.<EventResponse>builder()
+                    .message("Event ID cannot be null")
+                    .statusCode(400)
+                    .errors(new String[]{"Event ID is required"})
+                    .build();
+        }
+        if (eventRequest == null) {
+            log.warn("Attempted to update event with null request");
+            return ApiResponse.<EventResponse>builder()
+                    .message("Event request cannot be null")
+                    .statusCode(400)
+                    .errors(new String[]{"Event request is required"})
+                    .build();
+        }
+        try {
+            Optional<EventEntity> eventOpt = eventRepository.findById(id);
+            if (eventOpt.isEmpty()) {
+                log.info("Event not found with ID: {}", id);
+                return ApiResponse.<EventResponse>builder()
+                        .message("Event not found")
+                        .statusCode(404)
+                        .errors(new String[]{"No event with ID " + id})
+                        .build();
+            }
+            Long locationId = eventRequest.getLocationId();
+            if (locationId == null) {
+                log.warn("Attempted to update event with null location ID");
+                return ApiResponse.<EventResponse>builder()
+                        .message("Location ID is required")
+                        .statusCode(400)
+                        .errors(new String[]{"Location ID must be provided"})
+                        .build();
+            }
+            Optional<LocationEntity> locationOpt = locationRepository.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.info("Location not found with ID: {}", locationId);
+                return ApiResponse.<EventResponse>builder()
+                        .message("Location not found")
+                        .statusCode(404)
+                        .errors(new String[]{"No location with ID " + locationId})
+                        .build();
+            }
+            EventEntity event = eventOpt.get();
+            event.setTitle(eventRequest.getTitle());
+            event.setDescription(eventRequest.getDescription());
+            event.setDate(eventRequest.getDate());
+            event.setEventImageUrl(eventRequest.getEventImageUrl());
+            event.setEventType(eventRequest.getEventType());
+            event.setLocation(locationOpt.get());
+
+            EventEntity updated = eventRepository.save(event);
+            log.info("Event updated successfully with ID: {}", updated.getId());
+            return ApiResponse.<EventResponse>builder()
+                    .message("Event updated successfully")
+                    .statusCode(200)
+                    .data(EventResponse.toEventResponse(updated))
+                    .errors(null)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error updating event with ID: {}", id, e);
+            return ApiResponse.<EventResponse>builder()
+                    .message("Error updating event: " + e.getMessage())
+                    .statusCode(500)
+                    .errors(new String[]{e.getMessage()})
+                    .build();
+        }
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<String> deleteEvent(Long id) {
+        if (id == null) {
+            log.warn("Attempted to delete event with null ID");
             return ApiResponse.<String>builder()
-                    .message("Event not found")
-                    .statusCode(404)
+                    .message("Event ID cannot be null")
+                    .statusCode(400)
+                    .errors(new String[]{"Event ID is required"})
+                    .build();
+        }
+        try {
+            if (!eventRepository.existsById(id)) {
+                log.info("Event not found with ID: {}", id);
+                return ApiResponse.<String>builder()
+                        .message("Event not found")
+                        .statusCode(404)
+                        .errors(new String[]{"No event with ID " + id})
+                        .build();
+            }
+
+            Optional<EventEntity> eventOpt = eventRepository.findById(id);
+            if (eventOpt.isPresent()) {
+                EventEntity event = eventOpt.get();
+                String imageUrl = event.getEventImageUrl();
+                eventRepository.deleteById(id);
+                log.info("Event deleted successfully with ID: {}", id);
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    boolean deleted = fileStorageService.deleteFile(imageUrl);
+                    if (!deleted) {
+                        log.warn("Failed to delete image for event ID: {}, URL: {}", id, imageUrl);
+                    }
+                }
+                return ApiResponse.<String>builder()
+                        .message("Event deleted successfully")
+                        .statusCode(200)
+                        .errors(null)
+                        .build();
+            } else {
+                // fallback - should not happen
+                eventRepository.deleteById(id);
+                log.info("Event deleted successfully with ID: {}", id);
+                return ApiResponse.<String>builder()
+                        .message("Event deleted successfully")
+                        .statusCode(200)
+                        .errors(null)
+                        .build();
+            }
+        } catch (Exception e) {
+            log.error("Error deleting event with ID: {}", id, e);
+            return ApiResponse.<String>builder()
+                    .message("Error deleting event: " + e.getMessage())
+                    .statusCode(500)
+                    .errors(new String[]{e.getMessage()})
                     .build();
         }
     }
 
     @Override
     public ApiResponse<String> uploadImage(MultipartFile file) {
-        final Path uploadDirectory = Paths.get("src/main/resources/static/images");
-
-        if (!Files.exists(uploadDirectory)) {
-            try {
-                Files.createDirectories(uploadDirectory);
-            } catch (IOException e) {
-                return ApiResponse.<String>builder()
-                        .message("Could not create upload directory")
-                        .statusCode(500)
-                        .data(null)
-                        .build();
-            }
+        if (file == null) {
+            log.warn("Attempted to upload null file");
+            return ApiResponse.<String>builder()
+                    .message("File cannot be null")
+                    .statusCode(400)
+                    .errors(new String[]{"File must not be null"})
+                    .build();
         }
-
         if (file.isEmpty()) {
+            log.warn("Attempted to upload empty file");
             return ApiResponse.<String>builder()
                     .message("Please select a file")
                     .statusCode(400)
-                    .data(null)
+                    .errors(new String[]{"File is empty"})
                     .build();
         }
-
-        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String ext = "";
-
-        int extIndex = filename.lastIndexOf('.');
-        if (extIndex > 0) {
-            ext = filename.substring(extIndex);
-        }
-        String newFilename = "site-bg-" + System.currentTimeMillis() + ext;
-
         try {
-            Path targetPath = uploadDirectory.resolve(newFilename);
-            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-            String publicPath = "http://localhost:8081/api/v1/images/" + newFilename; // TODO: Production Pfad anpassen
-
+            String imageUrl = fileStorageService.storeImage(file, Optional.of("events"), Optional.of("event-"));
+            log.info("Image uploaded successfully: {}", imageUrl);
             return ApiResponse.<String>builder()
-                    .message("Upload erfolgreich")
+                    .message("Upload successful")
                     .statusCode(200)
-                    .data(publicPath)
+                    .data(imageUrl)
+                    .errors(null)
                     .build();
-        } catch (IOException e) {
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid image upload: {}", e.getMessage());
             return ApiResponse.<String>builder()
-                    .message("Fehler beim Upload")
+                    .message(e.getMessage())
+                    .statusCode(400)
+                    .errors(new String[]{e.getMessage()})
+                    .build();
+        } catch (Exception e) {
+            log.error("Error uploading image", e);
+            return ApiResponse.<String>builder()
+                    .message("Error uploading image: " + e.getMessage())
                     .statusCode(500)
+                    .errors(new String[]{e.getMessage()})
                     .build();
         }
     }
@@ -229,15 +318,15 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional(readOnly = true)
     public ApiResponse<List<EventResponse>> getAllEvents() {
-        List<EventEntity> eventEntities = eventRepository.findAll();
-        List<EventResponse> eventResponses = eventEntities.stream()
+        List<EventResponse> events = eventRepository.findAll()
+                .stream()
                 .map(EventResponse::toEventResponse)
                 .collect(Collectors.toList());
-        
         return ApiResponse.<List<EventResponse>>builder()
                 .message("Events retrieved successfully")
                 .statusCode(200)
-                .data(eventResponses)
+                .data(events)
+                .errors(null)
                 .build();
     }
 

@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2025 Sebastian Hamm. All Rights Reserved.
- *
+ * <p>
  * Represents an event, such as a concert or a public appearance.
- *
+ * <p>
  * Each event has a title, date, description, and an associated location. It is a
  * core entity for displaying upcoming or past activities.
  *
@@ -14,65 +14,61 @@ package com.hammsebastian.backend_stadtkapelle_eisenstadt.entity;
 
 import com.hammsebastian.backend_stadtkapelle_eisenstadt.enums.EventType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
 import java.time.LocalDate;
 
-// Lombok annotations
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
-
-// JPA annotations
 @Entity
 @Table(name = "events")
+@EntityListeners(AuditingEntityListener.class)
 public class EventEntity {
 
-    /**
-     * The unique identifier for the event.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * The title of the event. Mandatory.
-     */
-    @Column(name = "title", nullable = false, length = 255)
+    @NotBlank
+    @Column(nullable = false, length = 255)
     private String title;
 
-    /**
-     * A detailed description of the event. Optional.
-     */
-    @Column(name = "description", length = 2000)
+    @Lob
+    @Column(length = 5000) // lieber größer, falls Beschreibung wächst
     private String description;
 
-    /**
-     * The date on which the event takes place. Mandatory.
-     */
-    @Column(name = "date", nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private LocalDate date;
 
-    /**
-     * The URL to an image representing the event. Optional.
-     */
-    @Column(name = "event_image_url", length = 500)
+    @Size(max = 500)
+    @Column(length = 500)
     private String eventImageUrl;
 
-    /**
-     * The type of the event (e.g., Concert, Rehearsal). Stored as a string in the database.
-     */
+    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "event_type", nullable = false)
+    @Column(nullable = false)
     private EventType eventType;
 
-    /**
-     * The location where the event is held. The relationship is loaded lazily for performance.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "location_id", nullable = false)
     private LocationEntity location;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    private Instant updatedAt;
 }
